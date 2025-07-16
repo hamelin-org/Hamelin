@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hamelin", "src\Hamelin\Hamelin.csproj", "{E566E058-E767-4BF8-B87C-7B9FA96C5D2C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{C0A7AF13-8AB8-4C95-B7F5-EB5887B02585}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hamelin.Tests.Unit", "tests\Hamelin.Tests.Unit\Hamelin.Tests.Unit.csproj", "{66355312-B5AB-4242-8F41-A917CBFD2F7D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E566E058-E767-4BF8-B87C-7B9FA96C5D2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E566E058-E767-4BF8-B87C-7B9FA96C5D2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E566E058-E767-4BF8-B87C-7B9FA96C5D2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E566E058-E767-4BF8-B87C-7B9FA96C5D2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66355312-B5AB-4242-8F41-A917CBFD2F7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66355312-B5AB-4242-8F41-A917CBFD2F7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66355312-B5AB-4242-8F41-A917CBFD2F7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66355312-B5AB-4242-8F41-A917CBFD2F7D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
