@@ -1,4 +1,7 @@
 ﻿<Solution>
+  <Folder Name="/build/">
+    <File Path=".github\workflows\pr.yml" />
+  </Folder>
   <Folder Name="/config/">
     <File Path=".gitignore" />
     <File Path=".editorconfig" />

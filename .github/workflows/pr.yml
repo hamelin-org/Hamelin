@@ -7,6 +7,7 @@ on:
 
 env:
   configuration: Release
+  solutionFile: ./Hamelin.slnx
 
 jobs:
   build:
@@ -17,13 +18,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore $solutionFile
 
       - name: Format code
-        run: dotnet format --no-restore --verify-no-changes
+        run: dotnet format $solutionFile --no-restore --verify-no-changes
 
       - name: Build project
-        run: dotnet build --no-restore --configuration $configuration
+        run: dotnet build $solutionFile --no-restore --configuration $configuration
 
       - name: Run tests
-        run: dotnet test --no-build
+        run: dotnet test $solutionFile --no-build
