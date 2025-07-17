@@ -1,4 +1,4 @@
-name: Pull Request
+name: Pull Requset
 
 on:
   pull_request:
