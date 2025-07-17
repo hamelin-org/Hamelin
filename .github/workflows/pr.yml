@@ -1,0 +1,27 @@
+name: Pull Requset
+
+on:
+  pull_request:
+    branches: [ $default-branch ]
+
+env:
+  configuration: Release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Format code
+        run: dotnet format --no-restore --verify-no-changes
+
+      - name: Build project
+        run: dotnet build --no-restore --configuration {{ $env.configuration }}
+
+      - name: Run tests
+        run: dotnet test --no-build
