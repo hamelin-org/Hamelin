@@ -3,14 +3,13 @@ namespace Hamelin.Tests.Unit;
 public class PipelineApplicationTests
 {
     [Fact]
-    public async Task CreateBuilder_ShouldReturnPipelineApplicationBuilder()
+    public async Task StartAsync_DoesNotThrow()
     {
         // Arrange
-        string[] args = ["arg1", "arg2"];
+        var builder = PipelineApplication.CreateBuilder();
+        var pipeline = builder.Build();
 
         // Act
-        var builder = PipelineApplication.CreateBuilder(args);
-        var pipeline = builder.Build();
         var act = () => pipeline.StartAsync(CancellationToken.None);
 
         // Assert
