@@ -1,0 +1,12 @@
+﻿<Solution>
+  <Folder Name="/config/">
+    <File Path=".gitignore" />
+    <File Path=".editorconfig" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Hamelin/Hamelin.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Hamelin.Tests.Unit/Hamelin.Tests.Unit.csproj" />
+  </Folder>
+</Solution>
