@@ -35,14 +35,14 @@ public class PipelineApplication : IHost
     }
 
     /// <summary>
-    /// Creates a new <see cref="PipelineApplicationBuilder"/> with configured defaults
+    /// Creates a new <see cref="PipelineApplicationBuilder"/> with default settings
     /// that can be used to configure a CI/CD pipeline.
     /// </summary>
     /// <returns>The created builder.</returns>
     public static PipelineApplicationBuilder CreateBuilder() => new(new PipelineApplicationOptions());
 
     /// <summary>
-    /// Creates a new <see cref="PipelineApplicationBuilder"/> with configured defaults
+    /// Creates a new <see cref="PipelineApplicationBuilder"/> with default settings
     /// that can be used to configure a CI/CD pipeline.
     /// </summary>
     /// <param name="args">The command-line arguments passed to the application.</param>
@@ -50,7 +50,7 @@ public class PipelineApplication : IHost
     public static PipelineApplicationBuilder CreateBuilder(string[] args) => new(new PipelineApplicationOptions() { Args = args });
 
     /// <summary>
-    /// Creates a new <see cref="PipelineApplicationBuilder"/> with configured defaults
+    /// Creates a new <see cref="PipelineApplicationBuilder"/> with default settings
     /// that can be used to configure a CI/CD pipeline.
     /// </summary>
     /// <param name="options">The options to pass the pipeline builder.</param>
