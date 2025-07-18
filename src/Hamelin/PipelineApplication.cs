@@ -36,8 +36,8 @@ public class PipelineApplication : IHost
     /// <returns>The current <see cref="PipelineApplication"/> instance.</returns>
     public PipelineApplication RunStep<TStep>() where TStep : class, IPipelineStep
     {
-        var stepRepo = _host.Services.GetRequiredService<PipelineStepCollection>();
-        stepRepo.AddStep<TStep>();
+        var collector = _host.Services.GetRequiredService<IPipelineStepCollector>();
+        collector.AddStep<TStep>();
         return this;
     }
 

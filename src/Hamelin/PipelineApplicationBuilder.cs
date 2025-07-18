@@ -81,6 +81,8 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
     {
         // Stores the steps that will be executed in the pipeline.
         services.AddSingleton<PipelineStepCollection>();
+        services.AddSingleton<IPipelineStepCollector>(sp => sp.GetRequiredService<PipelineStepCollection>());
+        services.AddSingleton<IPipelineStepProvider>(sp => sp.GetRequiredService<PipelineStepCollection>());
 
         // This is the service responsible for running the pipeline.
         services.AddHostedService<PipelineHost>();

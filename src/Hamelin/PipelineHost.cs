@@ -6,17 +6,17 @@ namespace Hamelin;
 /// The hosted service that runs the pipeline.
 /// </summary>
 /// <param name="lifetime">The application lifetime.</param>
-/// <param name="stepCollection">The collection of pipeline steps to run.</param>
+/// <param name="stepProvider">The collection of pipeline steps to run.</param>
 internal class PipelineHost(
     IHostApplicationLifetime lifetime,
-    PipelineStepCollection stepCollection
+    IPipelineStepProvider stepProvider
 ) : IHostedService
 {
     /// <inheritdoc />
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         // Run each step in the pipeline.
-        var steps = stepCollection.GetSteps();
+        var steps = stepProvider.GetSteps();
         foreach (var step in steps)
         {
             await step.Run(cancellationToken);
