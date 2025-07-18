@@ -84,11 +84,11 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
     private static void ApplyOverridableServices(IServiceCollection services)
     {
         // Check if the user has supplied their own step provider, or register the default.
-        if (services.Any(d => d.ServiceType == typeof(IPipelineStepProvider)))
+        if (services.All(d => d.ServiceType != typeof(IPipelineStepProvider)))
         {
             services.TryAddSingleton<PipelineStepCollection>();
-            services.AddSingleton<IPipelineStepCollector>(sp => sp.GetRequiredService<PipelineStepCollection>());
-            services.AddSingleton<IPipelineStepProvider>(sp => sp.GetRequiredService<PipelineStepCollection>());
+            services.TryAddSingleton<IPipelineStepCollector>(sp => sp.GetRequiredService<PipelineStepCollection>());
+            services.TryAddSingleton<IPipelineStepProvider>(sp => sp.GetRequiredService<PipelineStepCollection>());
         }
     }
 

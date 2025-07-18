@@ -15,6 +15,6 @@ public static class ServiceCollectionExtensions
     /// <returns>The updated service collection with the step registered.</returns>
     public static IServiceCollection AddStep<TPipelineStep>(this IServiceCollection services) where TPipelineStep : class, IPipelineStep
     {
-        return services.AddTransient<IPipelineStep, TPipelineStep>();
+        return services.AddTransient<TPipelineStep>();
     }
 }
