@@ -1,6 +1,7 @@
 using Hamelin.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.Metrics;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -29,7 +30,7 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
             Configuration = new ConfigurationManager(),
         });
 
-        ApplyDefaultServices(_innerBuilder.Services);
+        ApplyMandatoryServices(_innerBuilder.Services);
     }
 
     /// <inheritdoc />
@@ -67,6 +68,9 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
     /// <returns>The configured pipeline application.</returns>
     public PipelineApplication Build()
     {
+        // We add optional services here to give the user a chance to supply their own before building the application.
+        ApplyOverridableServices(Services);
+
         var host = _innerBuilder.Build();
         return new PipelineApplication(host);
     }
@@ -77,13 +81,19 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
         Action<TContainerBuilder>? configure = null
     ) where TContainerBuilder : notnull => _innerBuilder.ConfigureContainer(factory, configure);
 
-    private static void ApplyDefaultServices(IServiceCollection services)
+    private static void ApplyOverridableServices(IServiceCollection services)
     {
-        // Stores the steps that will be executed in the pipeline.
-        services.AddSingleton<PipelineStepCollection>();
-        services.AddSingleton<IPipelineStepCollector>(sp => sp.GetRequiredService<PipelineStepCollection>());
-        services.AddSingleton<IPipelineStepProvider>(sp => sp.GetRequiredService<PipelineStepCollection>());
+        // Check if the user has supplied their own step provider, or register the default.
+        if (services.Any(d => d.ServiceType == typeof(IPipelineStepProvider)))
+        {
+            services.TryAddSingleton<PipelineStepCollection>();
+            services.AddSingleton<IPipelineStepCollector>(sp => sp.GetRequiredService<PipelineStepCollection>());
+            services.AddSingleton<IPipelineStepProvider>(sp => sp.GetRequiredService<PipelineStepCollection>());
+        }
+    }
 
+    private static void ApplyMandatoryServices(IServiceCollection services)
+    {
         // This is the service responsible for running the pipeline.
         services.AddHostedService<PipelineHost>();
     }

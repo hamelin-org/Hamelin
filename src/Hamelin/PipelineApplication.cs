@@ -36,7 +36,11 @@ public class PipelineApplication : IHost
     /// <returns>The current <see cref="PipelineApplication"/> instance.</returns>
     public PipelineApplication RunStep<TStep>() where TStep : class, IPipelineStep
     {
-        var collector = _host.Services.GetRequiredService<IPipelineStepCollector>();
+        var collector = _host.Services.GetService<IPipelineStepCollector>();
+        if (collector == null)
+        {
+            throw new InvalidOperationException("This method of step registration is not supported when a custom IPipelineStepProvider has been configured.");
+        }
         collector.AddStep<TStep>();
         return this;
     }
