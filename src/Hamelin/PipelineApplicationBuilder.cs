@@ -1,3 +1,4 @@
+using Hamelin.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.Metrics;
@@ -50,6 +51,17 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
     public IServiceCollection Services => _innerBuilder.Services;
 
     /// <summary>
+    /// Adds a step to the pipeline that will be run when the application is executed.
+    /// </summary>
+    /// <typeparam name="TStep"></typeparam>
+    /// <returns></returns>
+    public PipelineApplicationBuilder AddStep<TStep>() where TStep : class, IPipelineStep
+    {
+        Services.AddStep<TStep>();
+        return this;
+    }
+
+    /// <summary>
     /// Builds the <see cref="PipelineApplication" />.
     /// </summary>
     /// <returns>The configured pipeline application.</returns>
@@ -67,6 +79,9 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
 
     private static void ApplyDefaultServices(IServiceCollection services)
     {
+        // Stores the steps that will be executed in the pipeline.
+        services.AddSingleton<PipelineStepCollection>();
+
         // This is the service responsible for running the pipeline.
         services.AddHostedService<PipelineHost>();
     }
