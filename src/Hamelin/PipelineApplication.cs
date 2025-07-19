@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Hamelin;
 
@@ -26,6 +27,23 @@ public class PipelineApplication : IHost
 
     /// <inheritdoc />
     public Task StopAsync(CancellationToken cancellationToken) => _host.StopAsync(cancellationToken);
+
+    /// <summary>
+    /// Adds a step to the pipeline that will be run when the application is executed.
+    /// Steps are resolved from the service provider and executed in the order they were added.
+    /// </summary>
+    /// <typeparam name="TStep">The type of the step to add. It must implement <see cref="IPipelineStep"/>.</typeparam>
+    /// <returns>The current <see cref="PipelineApplication"/> instance.</returns>
+    public PipelineApplication RunStep<TStep>() where TStep : class, IPipelineStep
+    {
+        var collector = _host.Services.GetService<IPipelineStepCollector>();
+        if (collector == null)
+        {
+            throw new InvalidOperationException("This method of step registration is not supported when a custom IPipelineStepProvider has been configured.");
+        }
+        collector.AddStep<TStep>();
+        return this;
+    }
 
     /// <inheritdoc />
     public void Dispose()
