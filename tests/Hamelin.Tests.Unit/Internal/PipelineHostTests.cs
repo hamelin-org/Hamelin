@@ -4,7 +4,7 @@ using Hamelin.Tests.Unit.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Hamelin.Tests.Unit;
+namespace Hamelin.Tests.Unit.Internal;
 
 public class PipelineHostTests
 {
