@@ -1,3 +1,4 @@
+using Hamelin.Internal;
 using Hamelin.Steps;
 using Hamelin.Tests.Unit.Helpers;
 using Microsoft.Extensions.DependencyInjection;

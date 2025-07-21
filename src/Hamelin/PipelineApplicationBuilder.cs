@@ -1,4 +1,5 @@
 using Hamelin.Extensions;
+using Hamelin.Internal;
 using Hamelin.Steps;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -97,6 +98,8 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
 
     private static void ApplyMandatoryServices(IServiceCollection services)
     {
+        services.AddScoped<IPipelineContext, DefaultPipelineContext>();
+
         // This is the service responsible for running the pipeline.
         services.AddHostedService<PipelineHost>();
     }
