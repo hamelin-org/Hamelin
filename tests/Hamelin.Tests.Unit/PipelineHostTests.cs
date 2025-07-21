@@ -18,11 +18,7 @@ public class PipelineHostTests
             .AddSingleton(provider)
             .BuildServiceProvider();
 
-        var scope = Substitute.For<IServiceScope>();
-        scope.ServiceProvider.Returns(services);
-
-        var scopeFactory = Substitute.For<IServiceScopeFactory>();
-        scopeFactory.CreateScope().Returns(scope);
+        var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
 
         var host = new PipelineHost(lifetime, scopeFactory);
 
@@ -50,11 +46,7 @@ public class PipelineHostTests
             .AddSingleton(stepProvider)
             .BuildServiceProvider();
 
-        var scope = Substitute.For<IServiceScope>();
-        scope.ServiceProvider.Returns(services);
-
-        var scopeFactory = Substitute.For<IServiceScopeFactory>();
-        scopeFactory.CreateScope().Returns(scope);
+        var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
 
         var host = new PipelineHost(lifetime, scopeFactory);
 
