@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Hamelin;
@@ -6,17 +7,22 @@ namespace Hamelin;
 /// The hosted service that runs the pipeline.
 /// </summary>
 /// <param name="lifetime">The application lifetime.</param>
+/// <param name="scopeFactory">The factory that will be used to scope each execution of the pipeline.</param>
 /// <param name="stepProvider">The collection of pipeline steps to run.</param>
 internal class PipelineHost(
     IHostApplicationLifetime lifetime,
+    IServiceScopeFactory scopeFactory,
     IPipelineStepProvider stepProvider
 ) : IHostedService
 {
     /// <inheritdoc />
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        // Resolve the steps from a scoped service provider.
+        await using var scope = scopeFactory.CreateAsyncScope();
+        var steps = stepProvider.GetSteps(scope.ServiceProvider);
+
         // Run each step in the pipeline.
-        var steps = stepProvider.GetSteps();
         foreach (var step in steps)
         {
             await step.Run(cancellationToken);

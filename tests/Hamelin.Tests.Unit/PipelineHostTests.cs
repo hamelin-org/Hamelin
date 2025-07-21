@@ -1,4 +1,5 @@
 using Hamelin.Tests.Unit.Helpers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Hamelin.Tests.Unit;
@@ -10,9 +11,10 @@ public class PipelineHostTests
     {
         // Arrange
         var lifetime = Substitute.For<IHostApplicationLifetime>();
+        var scopeFactory = Substitute.For<IServiceScopeFactory>();
         var provider = Substitute.For<IPipelineStepProvider>();
 
-        var host = new PipelineHost(lifetime, provider);
+        var host = new PipelineHost(lifetime, scopeFactory, provider);
 
         // Act
         await host.StartAsync(CancellationToken.None);
@@ -31,10 +33,12 @@ public class PipelineHostTests
         var step2 = PipelineStepHelpers.CreateMock();
         var step3 = PipelineStepHelpers.CreateMock();
 
-        var provider = Substitute.For<IPipelineStepProvider>();
-        provider.GetSteps().Returns([step1, step2, step3]);
+        var scopeFactory = Substitute.For<IServiceScopeFactory>();
 
-        var host = new PipelineHost(lifetime, provider);
+        var stepProvider = Substitute.For<IPipelineStepProvider>();
+        stepProvider.GetSteps(Arg.Any<IServiceProvider>()).Returns([step1, step2, step3]);
+
+        var host = new PipelineHost(lifetime, scopeFactory, stepProvider);
 
         // Act
         await host.StartAsync(CancellationToken.None);
