@@ -8,5 +8,5 @@ public class PipelineExecutionOptions
     /// <summary>
     /// If `true` then application termination will be requested the pipeline run is completed
     /// </summary>
-    public bool StopApplicationOnCompletion { get; init; } =  true;
+    public bool StopApplicationOnCompletion { get; init; } = true;
 }
