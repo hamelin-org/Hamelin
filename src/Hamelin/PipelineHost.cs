@@ -9,7 +9,10 @@ namespace Hamelin;
 /// </summary>
 /// <param name="lifetime">The application lifetime.</param>
 /// <param name="scopeFactory">The factory that will be used to scope each execution of the pipeline.</param>
-internal class PipelineHost(IHostApplicationLifetime lifetime, IServiceScopeFactory scopeFactory) : IHostedService
+internal class PipelineHost(
+    IHostApplicationLifetime lifetime,
+    IServiceScopeFactory scopeFactory
+) : IHostedService
 {
     /// <inheritdoc />
     public async Task StartAsync(CancellationToken cancellationToken)
