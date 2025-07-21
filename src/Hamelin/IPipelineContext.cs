@@ -3,12 +3,17 @@ using Microsoft.Extensions.FileProviders;
 namespace Hamelin;
 
 /// <summary>
-/// A service that can be injected to provide context for the current pipeline execution.
+/// Provides context for the pipeline execution.
 /// </summary>
 public interface IPipelineContext
 {
     /// <summary>
-    /// Gets an abstraction over the file system that can be used to access files and directories.
+    /// Gets the file system provider used by the pipeline.
     /// </summary>
-    public IFileProvider FileSystem { get; }
+    IFileProvider FileSystem { get; }
+
+    /// <summary>
+    /// Gets the state of the pipeline, which can be used to store and retrieve data between steps.
+    /// </summary>
+    IPipelineState State { get; }
 }

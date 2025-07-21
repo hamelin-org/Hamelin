@@ -87,6 +87,7 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
     private static void ApplyOverridableServices(IServiceCollection services)
     {
         services.TryAddScoped<IFileProvider>(_ => new PhysicalFileProvider(System.Environment.CurrentDirectory));
+        services.TryAddScoped<IPipelineState, DefaultPipelineState>();
         services.TryAddScoped<IPipelineContext, DefaultPipelineContext>();
 
         // Check if the user has supplied their own step provider, or register the default.
