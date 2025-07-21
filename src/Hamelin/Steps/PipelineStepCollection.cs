@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Hamelin;
+namespace Hamelin.Steps;
 
 internal class PipelineStepCollection : IPipelineStepCollector, IPipelineStepProvider
 {

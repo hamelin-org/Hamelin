@@ -1,4 +1,4 @@
-namespace Hamelin;
+namespace Hamelin.Steps;
 
 /// <summary>
 /// Represents a provider for pipeline steps.
