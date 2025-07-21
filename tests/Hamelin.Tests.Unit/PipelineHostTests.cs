@@ -1,4 +1,3 @@
-using Hamelin.Steps;
 using Hamelin.Tests.Unit.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -12,15 +11,10 @@ public class PipelineHostTests
     {
         // Arrange
         var lifetime = Substitute.For<IHostApplicationLifetime>();
-
+        var scopeFactory = Substitute.For<IServiceScopeFactory>();
         var provider = Substitute.For<IPipelineStepProvider>();
-        var services = new ServiceCollection()
-            .AddSingleton(provider)
-            .BuildServiceProvider();
 
-        var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
-
-        var host = new PipelineHost(lifetime, scopeFactory);
+        var host = new PipelineHost(lifetime, scopeFactory, provider);
 
         // Act
         await host.StartAsync(CancellationToken.None);
@@ -39,16 +33,12 @@ public class PipelineHostTests
         var step2 = PipelineStepHelpers.CreateMock();
         var step3 = PipelineStepHelpers.CreateMock();
 
-        var provider = Substitute.For<IPipelineStepProvider>();
-        provider.GetSteps().Returns([step1, step2, step3]);
+        var scopeFactory = Substitute.For<IServiceScopeFactory>();
 
-        var services = new ServiceCollection()
-            .AddSingleton(provider)
-            .BuildServiceProvider();
+        var stepProvider = Substitute.For<IPipelineStepProvider>();
+        stepProvider.GetSteps(Arg.Any<IServiceProvider>()).Returns([step1, step2, step3]);
 
-        var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
-
-        var host = new PipelineHost(lifetime, scopeFactory);
+        var host = new PipelineHost(lifetime, scopeFactory, stepProvider);
 
         // Act
         await host.StartAsync(CancellationToken.None);

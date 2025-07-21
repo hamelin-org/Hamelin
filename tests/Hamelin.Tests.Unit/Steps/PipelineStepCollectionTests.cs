@@ -15,12 +15,12 @@ public class PipelineStepCollectionTests
             .AddStep<DummyStep2>()
             .BuildServiceProvider();
 
-        var collection = new PipelineStepCollection(services);
+        var collection = new PipelineStepCollection();
         collection.AddStep<DummyStep1>();
         collection.AddStep<DummyStep2>();
 
         // Act
-        var steps = collection.GetSteps().ToList();
+        var steps = collection.GetSteps(services).ToList();
 
         // Assert
         steps.ShouldBeOfTypes(typeof(DummyStep1), typeof(DummyStep2));
