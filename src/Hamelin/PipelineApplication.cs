@@ -29,12 +29,12 @@ public class PipelineApplication : IHost
     public Task StopAsync(CancellationToken cancellationToken) => _host.StopAsync(cancellationToken);
 
     /// <summary>
-    /// Adds a step to the pipeline that will be run when the application is executed.
+    /// Registers a step with the pipeline that will be run when the application is executed.
     /// Steps are resolved from the service provider and executed in the order they were added.
     /// </summary>
     /// <typeparam name="TStep">The type of the step to add. It must implement <see cref="IPipelineStep"/>.</typeparam>
     /// <returns>The current <see cref="PipelineApplication"/> instance.</returns>
-    public PipelineApplication RunStep<TStep>() where TStep : class, IPipelineStep
+    public PipelineApplication UseStep<TStep>() where TStep : class, IPipelineStep
     {
         var collector = _host.Services.GetService<IPipelineStepCollector>();
         if (collector == null)

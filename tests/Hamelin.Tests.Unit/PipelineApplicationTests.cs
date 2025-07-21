@@ -13,7 +13,7 @@ public class PipelineApplicationTests
 
         var pipeline = builder.Build();
 
-        pipeline.RunStep<TestPipelineStep>();
+        pipeline.UseStep<TestPipelineStep>();
 
         // Act
         var act = () => pipeline.RunAsync();
