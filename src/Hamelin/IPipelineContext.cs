@@ -11,9 +11,4 @@ public interface IPipelineContext
     /// Gets an abstraction over the file system that can be used to access files and directories.
     /// </summary>
     public IFileProvider FileSystem { get; }
-
-    /// <summary>
-    /// Gets the current working directory of the pipeline execution.
-    /// </summary>
-    public string CurrentDirectory { get; }
 }

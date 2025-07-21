@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.Metrics;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -85,6 +86,9 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
 
     private static void ApplyOverridableServices(IServiceCollection services)
     {
+        services.TryAddScoped<IFileProvider>(_ => new PhysicalFileProvider(System.Environment.CurrentDirectory));
+        services.TryAddScoped<IPipelineContext, DefaultPipelineContext>();
+
         // Check if the user has supplied their own step provider, or register the default.
         if (services.Any(d => d.ServiceType == typeof(IPipelineStepProvider)))
         {
@@ -98,7 +102,6 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
 
     private static void ApplyMandatoryServices(IServiceCollection services)
     {
-        services.AddScoped<IPipelineContext, DefaultPipelineContext>();
 
         // This is the service responsible for running the pipeline.
         services.AddHostedService<PipelineHost>();

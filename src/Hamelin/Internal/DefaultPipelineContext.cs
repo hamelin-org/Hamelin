@@ -2,8 +2,7 @@ using Microsoft.Extensions.FileProviders;
 
 namespace Hamelin.Internal;
 
-internal class DefaultPipelineContext(string currentDirectory) : IPipelineContext
+internal class DefaultPipelineContext(IFileProvider fileSystem) : IPipelineContext
 {
-    public IFileProvider FileSystem { get; } = new PhysicalFileProvider(currentDirectory);
-    public string CurrentDirectory { get; } = currentDirectory;
+    public IFileProvider FileSystem { get; } = fileSystem;
 }
