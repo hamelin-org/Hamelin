@@ -12,10 +12,19 @@ public class PipelineHostTests
     {
         // Arrange
         var lifetime = Substitute.For<IHostApplicationLifetime>();
-        var scopeFactory = Substitute.For<IServiceScopeFactory>();
-        var provider = Substitute.For<IPipelineStepProvider>();
 
-        var host = new PipelineHost(lifetime, scopeFactory, provider);
+        var provider = Substitute.For<IPipelineStepProvider>();
+        var services = new ServiceCollection()
+            .AddSingleton(provider)
+            .BuildServiceProvider();
+
+        var scope = Substitute.For<IServiceScope>();
+        scope.ServiceProvider.Returns(services);
+
+        var scopeFactory = Substitute.For<IServiceScopeFactory>();
+        scopeFactory.CreateScope().Returns(scope);
+
+        var host = new PipelineHost(lifetime, scopeFactory);
 
         // Act
         await host.StartAsync(CancellationToken.None);
@@ -34,12 +43,20 @@ public class PipelineHostTests
         var step2 = PipelineStepHelpers.CreateMock();
         var step3 = PipelineStepHelpers.CreateMock();
 
-        var scopeFactory = Substitute.For<IServiceScopeFactory>();
-
         var stepProvider = Substitute.For<IPipelineStepProvider>();
-        stepProvider.GetSteps(Arg.Any<IServiceProvider>()).Returns([step1, step2, step3]);
+        stepProvider.GetSteps().Returns([step1, step2, step3]);
 
-        var host = new PipelineHost(lifetime, scopeFactory, stepProvider);
+        var services = new ServiceCollection()
+            .AddSingleton(stepProvider)
+            .BuildServiceProvider();
+
+        var scope = Substitute.For<IServiceScope>();
+        scope.ServiceProvider.Returns(services);
+
+        var scopeFactory = Substitute.For<IServiceScopeFactory>();
+        scopeFactory.CreateScope().Returns(scope);
+
+        var host = new PipelineHost(lifetime, scopeFactory);
 
         // Act
         await host.StartAsync(CancellationToken.None);

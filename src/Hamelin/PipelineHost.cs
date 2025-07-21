@@ -9,19 +9,15 @@ namespace Hamelin;
 /// </summary>
 /// <param name="lifetime">The application lifetime.</param>
 /// <param name="scopeFactory">The factory that will be used to scope each execution of the pipeline.</param>
-/// <param name="stepProvider">The collection of pipeline steps to run.</param>
-internal class PipelineHost(
-    IHostApplicationLifetime lifetime,
-    IServiceScopeFactory scopeFactory,
-    IPipelineStepProvider stepProvider
-) : IHostedService
+internal class PipelineHost(IHostApplicationLifetime lifetime, IServiceScopeFactory scopeFactory) : IHostedService
 {
     /// <inheritdoc />
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         // Resolve the steps from a scoped service provider.
         await using var scope = scopeFactory.CreateAsyncScope();
-        var steps = stepProvider.GetSteps(scope.ServiceProvider);
+        var stepProvider = scope.ServiceProvider.GetRequiredService<IPipelineStepProvider>();
+        var steps = stepProvider.GetSteps();
 
         // Run each step in the pipeline.
         foreach (var step in steps)
