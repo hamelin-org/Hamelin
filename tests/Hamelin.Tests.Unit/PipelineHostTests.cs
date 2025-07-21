@@ -39,11 +39,11 @@ public class PipelineHostTests
         var step2 = PipelineStepHelpers.CreateMock();
         var step3 = PipelineStepHelpers.CreateMock();
 
-        var stepProvider = Substitute.For<IPipelineStepProvider>();
-        stepProvider.GetSteps().Returns([step1, step2, step3]);
+        var provider = Substitute.For<IPipelineStepProvider>();
+        provider.GetSteps().Returns([step1, step2, step3]);
 
         var services = new ServiceCollection()
-            .AddSingleton(stepProvider)
+            .AddSingleton(provider)
             .BuildServiceProvider();
 
         var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
