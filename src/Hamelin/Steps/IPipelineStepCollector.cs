@@ -1,4 +1,4 @@
-namespace Hamelin;
+namespace Hamelin.Steps;
 
 internal interface IPipelineStepCollector
 {

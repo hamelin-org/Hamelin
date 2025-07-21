@@ -1,7 +1,8 @@
 using Hamelin.Extensions;
+using Hamelin.Steps;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Hamelin.Tests.Unit;
+namespace Hamelin.Tests.Unit.Steps;
 
 public class PipelineStepCollectionTests
 {
