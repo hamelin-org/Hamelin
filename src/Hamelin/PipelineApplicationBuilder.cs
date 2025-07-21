@@ -1,9 +1,11 @@
 using Hamelin.Extensions;
+using Hamelin.Internal;
 using Hamelin.Steps;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.Metrics;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -15,6 +17,7 @@ namespace Hamelin;
 public class PipelineApplicationBuilder : IHostApplicationBuilder
 {
     private readonly HostApplicationBuilder _innerBuilder;
+    private readonly PipelineApplicationOptions _options;
 
     /// <summary>
     /// Creates a new instance of the <see cref="PipelineApplicationBuilder"/> with the given options.
@@ -22,6 +25,7 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
     /// <param name="options">The options to configure the pipeline application.</param>
     internal PipelineApplicationBuilder(PipelineApplicationOptions options)
     {
+        _options = options;
         _innerBuilder = new HostApplicationBuilder(new HostApplicationBuilderSettings
         {
             Args = options.Args,
@@ -30,8 +34,6 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
             ContentRootPath = options.ContentRootPath,
             Configuration = new ConfigurationManager(),
         });
-
-        ApplyMandatoryServices(_innerBuilder.Services);
     }
 
     /// <inheritdoc />
@@ -69,8 +71,8 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
     /// <returns>The configured pipeline application.</returns>
     public PipelineApplication Build()
     {
-        // We add optional services here to give the user a chance to supply their own before building the application.
-        ApplyOverridableServices(Services);
+        // We add services here to give the user a chance to supply their own before building the application.
+        ApplyServices(Services);
 
         var host = _innerBuilder.Build();
         return new PipelineApplication(host);
@@ -82,21 +84,21 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
         Action<TContainerBuilder>? configure = null
     ) where TContainerBuilder : notnull => _innerBuilder.ConfigureContainer(factory, configure);
 
-    private static void ApplyOverridableServices(IServiceCollection services)
+    private void ApplyServices(IServiceCollection services)
     {
+        services.TryAddScoped<IFileProvider>(_ => new PhysicalFileProvider(_innerBuilder.Environment.ContentRootPath));
+        services.TryAddScoped<IPipelineState, DefaultPipelineState>();
+        services.TryAddScoped<IPipelineContext, DefaultPipelineContext>();
+
         // Check if the user has supplied their own step provider, or register the default.
-        if (services.Any(d => d.ServiceType == typeof(IPipelineStepProvider)))
+        bool hasProvider = services.Any(d => d.ServiceType == typeof(IPipelineStepProvider));
+        if (!hasProvider)
         {
-            return;
+            services.TryAddSingleton<PipelineStepCollection>();
+            services.TryAddSingleton<IPipelineStepCollector>(sp => sp.GetRequiredService<PipelineStepCollection>());
+            services.TryAddSingleton<IPipelineStepProvider>(sp => sp.GetRequiredService<PipelineStepCollection>());
         }
 
-        services.TryAddSingleton<PipelineStepCollection>();
-        services.TryAddSingleton<IPipelineStepCollector>(sp => sp.GetRequiredService<PipelineStepCollection>());
-        services.TryAddSingleton<IPipelineStepProvider>(sp => sp.GetRequiredService<PipelineStepCollection>());
-    }
-
-    private static void ApplyMandatoryServices(IServiceCollection services)
-    {
         // This is the service responsible for running the pipeline.
         services.AddHostedService<PipelineHost>();
     }

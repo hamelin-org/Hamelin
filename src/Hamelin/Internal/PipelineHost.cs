@@ -2,7 +2,7 @@ using Hamelin.Steps;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Hamelin;
+namespace Hamelin.Internal;
 
 /// <summary>
 /// The hosted service that runs the pipeline.
