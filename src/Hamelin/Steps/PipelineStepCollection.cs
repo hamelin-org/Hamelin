@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Hamelin.Steps;
 
-internal class PipelineStepCollection : IPipelineStepCollector, IPipelineStepProvider
+internal class PipelineStepCollection(IServiceProvider services) : IPipelineStepCollector, IPipelineStepProvider
 {
     private readonly List<Type> _steps = [];
 
@@ -11,5 +11,5 @@ internal class PipelineStepCollection : IPipelineStepCollector, IPipelineStepPro
         _steps.Add(typeof(TStep));
     }
 
-    public IEnumerable<IPipelineStep> GetSteps(IServiceProvider provider) => _steps.Select(stepType => (IPipelineStep)provider.GetRequiredService(stepType));
+    public IEnumerable<IPipelineStep> GetSteps() => _steps.Select(stepType => (IPipelineStep)services.GetRequiredService(stepType));
 }
