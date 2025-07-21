@@ -17,6 +17,7 @@ namespace Hamelin;
 public class PipelineApplicationBuilder : IHostApplicationBuilder
 {
     private readonly HostApplicationBuilder _innerBuilder;
+    private readonly PipelineApplicationOptions _options;
 
     /// <summary>
     /// Creates a new instance of the <see cref="PipelineApplicationBuilder"/> with the given options.
@@ -24,6 +25,7 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
     /// <param name="options">The options to configure the pipeline application.</param>
     internal PipelineApplicationBuilder(PipelineApplicationOptions options)
     {
+        _options = options;
         _innerBuilder = new HostApplicationBuilder(new HostApplicationBuilderSettings
         {
             Args = options.Args,
@@ -82,9 +84,9 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
         Action<TContainerBuilder>? configure = null
     ) where TContainerBuilder : notnull => _innerBuilder.ConfigureContainer(factory, configure);
 
-    private static void ApplyServices(IServiceCollection services)
+    private void ApplyServices(IServiceCollection services)
     {
-        services.TryAddScoped<IFileProvider>(_ => new PhysicalFileProvider(System.Environment.CurrentDirectory));
+        services.TryAddScoped<IFileProvider>(_ => new PhysicalFileProvider(_innerBuilder.Environment.ContentRootPath));
         services.TryAddScoped<IPipelineState, DefaultPipelineState>();
         services.TryAddScoped<IPipelineContext, DefaultPipelineContext>();
 
