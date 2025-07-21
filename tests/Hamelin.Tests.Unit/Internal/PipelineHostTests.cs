@@ -3,13 +3,14 @@ using Hamelin.Steps;
 using Hamelin.Tests.Unit.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace Hamelin.Tests.Unit.Internal;
 
 public class PipelineHostTests
 {
     [Fact]
-    public async Task StartAsync_StopsApplicationWhenFinished()
+    public async Task StartAsync_WithStopApplicationOnCompletion_StopsApplicationWhenFinished()
     {
         // Arrange
         var lifetime = Substitute.For<IHostApplicationLifetime>();
@@ -21,13 +22,45 @@ public class PipelineHostTests
 
         var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
 
-        var host = new PipelineHost(lifetime, scopeFactory);
+        PipelineExecutionOptions pipelineExecutionOptions = new()
+        {
+            StopApplicationOnCompletion = true
+        };
+
+        var host = new PipelineHost(lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
 
         // Act
         await host.StartAsync(CancellationToken.None);
 
         // Assert
         lifetime.Received().StopApplication();
+    }
+
+    [Fact]
+    public async Task StartAsync_WithoutStopApplicationOnCompletion_DoesNotStopApplicationWhenFinished()
+    {
+        // Arrange
+        var lifetime = Substitute.For<IHostApplicationLifetime>();
+
+        var provider = Substitute.For<IPipelineStepProvider>();
+        var services = new ServiceCollection()
+            .AddSingleton(provider)
+            .BuildServiceProvider();
+
+        var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
+
+        PipelineExecutionOptions pipelineExecutionOptions = new()
+        {
+            StopApplicationOnCompletion = false
+        };
+
+        var host = new PipelineHost(lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
+
+        // Act
+        await host.StartAsync(CancellationToken.None);
+
+        // Assert
+        lifetime.DidNotReceive().StopApplication();
     }
 
     [Fact]
@@ -49,7 +82,9 @@ public class PipelineHostTests
 
         var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
 
-        var host = new PipelineHost(lifetime, scopeFactory);
+        PipelineExecutionOptions pipelineExecutionOptions = new();
+
+        var host = new PipelineHost(lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
 
         // Act
         await host.StartAsync(CancellationToken.None);
