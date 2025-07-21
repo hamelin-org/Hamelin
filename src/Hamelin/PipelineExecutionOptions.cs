@@ -1,13 +1,12 @@
-namespace Hamelin.Internal;
+namespace Hamelin;
 
 /// <summary>
-/// Settings for the pipeline host
+/// Settings to control the execution of the pipeline
 /// </summary>
-public class PipelineHostOptions
+public class PipelineExecutionOptions
 {
     /// <summary>
     /// If `true` then application termination will be requested the pipeline run is completed
     /// </summary>
-    // ReSharper disable once PropertyCanBeMadeInitOnly.Global
     public bool StopApplicationOnCompletion { get; init; } =  true;
 }

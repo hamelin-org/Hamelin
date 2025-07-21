@@ -22,12 +22,12 @@ public class PipelineHostTests
 
         var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
 
-        PipelineHostOptions pipelineHostOptions = new()
+        PipelineExecutionOptions pipelineExecutionOptions = new()
         {
             StopApplicationOnCompletion = true
         };
 
-        var host = new PipelineHost(lifetime, scopeFactory, Options.Create(pipelineHostOptions));
+        var host = new PipelineHost(lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
 
         // Act
         await host.StartAsync(CancellationToken.None);
@@ -49,12 +49,12 @@ public class PipelineHostTests
 
         var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
 
-        PipelineHostOptions pipelineHostOptions = new()
+        PipelineExecutionOptions pipelineExecutionOptions = new()
         {
             StopApplicationOnCompletion = false
         };
 
-        var host = new PipelineHost(lifetime, scopeFactory, Options.Create(pipelineHostOptions));
+        var host = new PipelineHost(lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
 
         // Act
         await host.StartAsync(CancellationToken.None);
@@ -82,9 +82,9 @@ public class PipelineHostTests
 
         var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
 
-        PipelineHostOptions pipelineHostOptions = new();
+        PipelineExecutionOptions pipelineExecutionOptions = new();
 
-        var host = new PipelineHost(lifetime, scopeFactory, Options.Create(pipelineHostOptions));
+        var host = new PipelineHost(lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
 
         // Act
         await host.StartAsync(CancellationToken.None);

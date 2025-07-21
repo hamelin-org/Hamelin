@@ -14,7 +14,7 @@ namespace Hamelin.Internal;
 internal class PipelineHost(
     IHostApplicationLifetime lifetime,
     IServiceScopeFactory scopeFactory,
-    IOptions<PipelineHostOptions> options
+    IOptions<PipelineExecutionOptions> options
 ) : BackgroundService
 {
     /// <inheritdoc />
