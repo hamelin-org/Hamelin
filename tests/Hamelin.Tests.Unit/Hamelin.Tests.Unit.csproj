@@ -27,4 +27,10 @@
     <ProjectReference Include="..\..\src\Hamelin\Hamelin.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="FileSystem\Physical\TestFile.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

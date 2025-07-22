@@ -1,11 +1,11 @@
-using Microsoft.Extensions.FileProviders;
+using Hamelin.FileSystem;
 using Microsoft.Extensions.Hosting;
 
 namespace Hamelin.Internal;
 
-internal class DefaultPipelineContext(IFileProvider fileSystem, IPipelineState state, IHostEnvironment env) : IPipelineContext
+internal class DefaultPipelineContext(IFileSystem fileSystem, IPipelineState state, IHostEnvironment env) : IPipelineContext
 {
-    public IFileProvider FileSystem { get; } = fileSystem;
+    public IFileSystem FileSystem { get; } = fileSystem;
     public IPipelineState State { get; } = state;
     public string CurrentDirectory { get; } = env.ContentRootPath;
 }
