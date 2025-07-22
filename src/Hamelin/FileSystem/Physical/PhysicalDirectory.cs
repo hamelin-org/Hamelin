@@ -1,5 +1,8 @@
+using System.Diagnostics;
+
 namespace Hamelin.FileSystem.Physical;
 
+[DebuggerDisplay("{Name} ({AbsolutePath})")]
 internal class PhysicalDirectory(string path) : IDirectory
 {
     public string Name { get; } = Path.GetFileName(path);
@@ -25,4 +28,6 @@ internal class PhysicalDirectory(string path) : IDirectory
             .EnumerateFiles(AbsolutePath)
             .Select(path => new PhysicalDirectory(path));
     }
+
+    public override string ToString() => AbsolutePath;
 }
