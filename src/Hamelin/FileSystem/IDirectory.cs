@@ -37,8 +37,9 @@ public interface IDirectory
     /// <summary>
     /// Gets the files contained in this directory.
     /// </summary>
+    /// <param name="searchPattern">The search pattern to match file names against. Supports globbing.</param>
     /// <returns>The files in this directory.</returns>
-    IEnumerable<IFile> GetFiles();
+    IEnumerable<IFile> GetFiles(string searchPattern = "*.*");
 
     /// <summary>
     /// Gets the subdirectories contained in this directory.

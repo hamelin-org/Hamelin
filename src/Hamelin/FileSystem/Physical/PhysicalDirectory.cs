@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.Extensions.FileSystemGlobbing;
 
 namespace Hamelin.FileSystem.Physical;
 
@@ -12,17 +13,19 @@ internal class PhysicalDirectory(string path) : IDirectory
     public IFile GetFile(string name) => new PhysicalFile(Path.Combine(AbsolutePath, name));
     public IDirectory GetDirectory(string name) => new PhysicalDirectory(Path.Combine(AbsolutePath, name));
 
-    public IEnumerable<IFile> GetFiles()
+    public IEnumerable<IFile> GetFiles(string searchPattern = "*.*")
     {
-        return Directory
-            .EnumerateFiles(AbsolutePath)
-            .Select(path => new PhysicalFile(path));
+        var matcher = new Matcher();
+        matcher.AddInclude(searchPattern);
+
+        var paths = matcher.GetResultsInFullPath(AbsolutePath);
+        return paths .Select(path => new PhysicalFile(path));
     }
 
     public IEnumerable<IDirectory> GetDirectories()
     {
         return Directory
-            .EnumerateFiles(AbsolutePath)
+            .EnumerateDirectories(AbsolutePath)
             .Select(path => new PhysicalDirectory(path));
     }
 
