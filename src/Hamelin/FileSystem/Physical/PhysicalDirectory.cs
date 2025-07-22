@@ -19,7 +19,7 @@ internal class PhysicalDirectory(string path) : IDirectory
         matcher.AddInclude(searchPattern);
 
         var paths = matcher.GetResultsInFullPath(AbsolutePath);
-        return paths .Select(path => new PhysicalFile(path));
+        return paths.Select(path => new PhysicalFile(path));
     }
 
     public IEnumerable<IDirectory> GetDirectories()
