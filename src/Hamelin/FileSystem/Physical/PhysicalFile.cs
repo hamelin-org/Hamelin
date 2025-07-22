@@ -2,9 +2,9 @@ namespace Hamelin.FileSystem.Physical;
 
 internal class PhysicalFile(string path) : IFile
 {
-    public string Name { get; } = System.IO.Path.GetFileName(path);
-    public string Path { get; } = path;
-    public bool Exists => File.Exists(Path);
-    public Stream OpenRead() => File.OpenRead(Path);
-    public Stream OpenWrite() => File.OpenWrite(Path);
+    public string Name { get; } = Path.GetFileName(path);
+    public string AbsolutePath { get; } = Path.GetFullPath(path);
+    public bool Exists => File.Exists(AbsolutePath);
+    public Stream OpenRead() => File.OpenRead(AbsolutePath);
+    public Stream OpenWrite() => File.OpenWrite(AbsolutePath);
 }

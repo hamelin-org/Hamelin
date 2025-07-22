@@ -13,7 +13,7 @@ public interface IDirectory
     /// <summary>
     /// Gets the full path to the directory.
     /// </summary>
-    string Path { get; }
+    string AbsolutePath { get; }
 
     /// <summary>
     /// Gets a value indicating whether this directory exists in the file system.
