@@ -1,4 +1,4 @@
-using Microsoft.Extensions.FileProviders;
+using Hamelin.FileSystem;
 
 namespace Hamelin;
 
@@ -10,7 +10,7 @@ public interface IPipelineContext
     /// <summary>
     /// Gets the file system provider used by the pipeline.
     /// </summary>
-    IFileProvider FileSystem { get; }
+    IFileSystem FileSystem { get; }
 
     /// <summary>
     /// Gets the state of the pipeline, which can be used to store and retrieve data between steps.

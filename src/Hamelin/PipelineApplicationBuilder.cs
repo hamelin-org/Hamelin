@@ -1,11 +1,12 @@
 using Hamelin.Extensions;
+using Hamelin.FileSystem;
+using Hamelin.FileSystem.Physical;
 using Hamelin.Internal;
 using Hamelin.Steps;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.Metrics;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -86,7 +87,7 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
 
     private void ApplyServices(IServiceCollection services)
     {
-        services.TryAddScoped<IFileProvider>(_ => new PhysicalFileProvider(_innerBuilder.Environment.ContentRootPath));
+        services.TryAddScoped<IFileSystem>(_ => new PhysicalFileSystem(_innerBuilder.Environment.ContentRootPath));
         services.TryAddScoped<IPipelineState, DefaultPipelineState>();
         services.TryAddScoped<IPipelineContext, DefaultPipelineContext>();
 
