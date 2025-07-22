@@ -13,7 +13,7 @@ internal class PhysicalDirectory(string path) : IDirectory
     public IFile GetFile(string name) => new PhysicalFile(Path.Combine(AbsolutePath, name));
     public IDirectory GetDirectory(string name) => new PhysicalDirectory(Path.Combine(AbsolutePath, name));
 
-    public IEnumerable<IFile> GetFiles(string searchPattern = "*.*")
+    public IEnumerable<IFile> GetFiles(string searchPattern = "*")
     {
         var matcher = new Matcher();
         matcher.AddInclude(searchPattern);
