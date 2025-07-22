@@ -16,4 +16,9 @@ public interface IPipelineContext
     /// Gets the state of the pipeline, which can be used to store and retrieve data between steps.
     /// </summary>
     IPipelineState State { get; }
+
+    /// <summary>
+    /// Gets the current working directory.
+    /// </summary>
+    string CurrentDirectory { get; }
 }
