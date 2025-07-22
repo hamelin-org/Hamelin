@@ -44,16 +44,18 @@ public class PhysicalFileTests
     }
 
     [Fact]
-    public void OpenRead_ExistingFile_ShouldAllowRead()
+    public async Task OpenRead_ExistingFile_ShouldAllowRead()
     {
         // Arrange
         string path = "FileSystem/Physical/TestFile.txt";
         var file = new PhysicalFile(path);
 
         // Act
-        using var stream = file.OpenRead();
+        await using var stream = file.OpenRead();
+        using var sr = new StreamReader(stream);
+        string content = await sr.ReadToEndAsync(TestContext.Current.CancellationToken);
 
         // Assert
-        file.Name.ShouldBe("TestFile.txt");
+        content.Trim().ShouldBe("This file does exist.");
     }
 }
