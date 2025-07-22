@@ -30,7 +30,8 @@ public class PhysicalDirectoryTests
         dir.Exists.ShouldBeTrue();
     }
 
-    [Fact] public void Name_ShouldBeFileName()
+    [Fact]
+    public void Name_ShouldBeFileName()
     {
         // Arrange
         string path = "FileSystem/Physical";
