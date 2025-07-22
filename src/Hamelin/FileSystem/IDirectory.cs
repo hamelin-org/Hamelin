@@ -20,20 +20,6 @@ public interface IDirectory
     /// </summary>
     bool Exists { get; }
 
-    // Actions
-
-    /// <summary>
-    /// Creates this directory in the file system.
-    /// </summary>
-    void Create();
-
-    /// <summary>
-    /// Deletes this directory and its contents.
-    /// </summary>
-    void Delete();
-
-    // Navigation
-
     /// <summary>
     /// Gets the file with the specified name within this directory.
     /// </summary>
@@ -51,16 +37,12 @@ public interface IDirectory
     /// <summary>
     /// Gets the files contained in this directory.
     /// </summary>
-    /// <param name="searchPattern">The search pattern to match files against. Supports globbing.</param>
-    /// <param name="recursive">If true, searches subdirectories recursively.</param>
     /// <returns>The files in this directory.</returns>
-    IEnumerable<IFile> GetFiles(string searchPattern = "*.*", bool recursive = false);
+    IEnumerable<IFile> GetFiles();
 
     /// <summary>
     /// Gets the subdirectories contained in this directory.
     /// </summary>
-    /// <param name="searchPattern">The search pattern to match directories against. Supports globbing.</param>
-    /// <param name="recursive">If true, searches subdirectories recursively.</param>
-    /// <returns>The discovered directories.</returns>
-    IEnumerable<IDirectory> GetDirectories(string searchPattern = "*", bool recursive = false);
+    /// <returns>The subdirectories in this directory.</returns>
+    IEnumerable<IDirectory> GetDirectories();
 }

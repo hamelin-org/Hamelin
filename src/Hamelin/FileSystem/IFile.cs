@@ -21,11 +21,6 @@ public interface IFile
     bool Exists { get; }
 
     /// <summary>
-    /// Deletes this file from the file system.
-    /// </summary>
-    void Delete();
-
-    /// <summary>
     /// Opens the file for reading.
     /// </summary>
     /// <returns>A stream that can be read from.</returns>
