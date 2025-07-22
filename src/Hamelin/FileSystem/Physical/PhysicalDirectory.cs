@@ -9,9 +9,6 @@ internal class PhysicalDirectory(string path) : IDirectory
     public string AbsolutePath { get; } = Path.GetFullPath(path);
     public bool Exists => Directory.Exists(AbsolutePath);
 
-    public void Create() => Directory.CreateDirectory(AbsolutePath);
-    public void Delete() => Directory.Delete(AbsolutePath, true);
-
     public IFile GetFile(string name) => new PhysicalFile(Path.Combine(AbsolutePath, name));
     public IDirectory GetDirectory(string name) => new PhysicalDirectory(Path.Combine(AbsolutePath, name));
 
