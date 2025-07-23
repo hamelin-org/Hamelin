@@ -21,6 +21,16 @@ public interface IDirectory
     bool Exists { get; }
 
     /// <summary>
+    /// Creates the current directory in the file system if it doesn't exist.
+    /// </summary>
+    void Create();
+
+    /// <summary>
+    /// Deletes this directory and all its contents from the file system if it exists.
+    /// </summary>
+    void Delete();
+
+    /// <summary>
     /// Gets the file with the specified name within this directory.
     /// </summary>
     /// <param name="name">The name of the file to get.</param>

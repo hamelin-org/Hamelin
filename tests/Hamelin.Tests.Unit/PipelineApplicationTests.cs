@@ -1,7 +1,6 @@
 using Hamelin.Steps;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NSubstitute;
 
 namespace Hamelin.Tests.Unit;
 
@@ -12,7 +11,7 @@ public class PipelineApplicationTests
     {
         // Arrange
         var builder = PipelineApplication.CreateBuilder();
-        builder.AddStep<TestPipelineStep>();
+        builder.Services.AddStep<TestPipelineStep>();
 
         var pipeline = builder.Build();
 
