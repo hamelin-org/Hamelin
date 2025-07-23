@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hamelin.Build", "Hamelin.Build\Hamelin.Build.csproj", "{B8ABF3E2-D423-47C7-86D4-035FECC23A07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hamelin", "..\src\Hamelin\Hamelin.csproj", "{74C93B8D-3477-4B4E-BE04-B6A79D2CF2D4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8ABF3E2-D423-47C7-86D4-035FECC23A07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8ABF3E2-D423-47C7-86D4-035FECC23A07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8ABF3E2-D423-47C7-86D4-035FECC23A07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8ABF3E2-D423-47C7-86D4-035FECC23A07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74C93B8D-3477-4B4E-BE04-B6A79D2CF2D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74C93B8D-3477-4B4E-BE04-B6A79D2CF2D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74C93B8D-3477-4B4E-BE04-B6A79D2CF2D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74C93B8D-3477-4B4E-BE04-B6A79D2CF2D4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
