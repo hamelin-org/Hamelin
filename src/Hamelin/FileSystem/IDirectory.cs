@@ -26,7 +26,7 @@ public interface IDirectory
     void Create();
 
     /// <summary>
-    /// Deletes this directory from the file system if it exists.
+    /// Deletes this directory and all its contents from the file system if it exists.
     /// </summary>
     void Delete();
 
