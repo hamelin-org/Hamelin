@@ -26,16 +26,20 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
     internal PipelineApplicationBuilder(PipelineApplicationOptions options)
     {
         _options = options;
+
+        var configuration = new ConfigurationManager();
+        configuration.AddInMemoryCollection(new Dictionary<string, string?>() {
+            { "Logging:LogLevel:Microsoft.Hosting.Lifetime", nameof(LogLevel.Warning) }
+        });
+
         _innerBuilder = new HostApplicationBuilder(new HostApplicationBuilderSettings
         {
             Args = options.Args,
             ApplicationName = options.ApplicationName,
             EnvironmentName = options.EnvironmentName,
             ContentRootPath = options.ContentRootPath,
-            Configuration = new ConfigurationManager(),
+            Configuration = configuration,
         });
-
-        _innerBuilder.Logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
     }
 
     /// <inheritdoc />
