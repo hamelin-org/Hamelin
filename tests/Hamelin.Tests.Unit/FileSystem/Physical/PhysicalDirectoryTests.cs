@@ -44,6 +44,74 @@ public class PhysicalDirectoryTests
     }
 
     [Fact]
+    public void Create_ExistingDirectory_DoesNotThrow()
+    {
+        // Arrange
+        string path = "FileSystem/Physical";
+        var dir = new PhysicalDirectory(path);
+        dir.Exists.ShouldBeTrue();
+
+        // Act
+        var act = () => dir.Create();
+
+        // Assert
+        act.ShouldNotThrow();
+    }
+
+    [Fact]
+    public void Create_NewDirectory_CreatesDirectory()
+    {
+        // Arrange
+        string path = "FileSystem/Physical";
+        var dir = new PhysicalDirectory(path).GetDirectory("create-test");
+        dir.Exists.ShouldBeFalse();
+
+        try
+        {
+            // Act
+            dir.Create();
+
+            // Assert
+            dir.Exists.ShouldBeTrue();
+        }
+        finally
+        {
+            dir.Delete();
+        }
+    }
+
+    [Fact]
+    public void Delete_NonExistentDirectory_DoesNotThrow()
+    {
+        // Arrange
+        string path = "FileSystem/Physical";
+        var dir = new PhysicalDirectory(path).GetDirectory("does-not-exist");
+        dir.Exists.ShouldBeFalse();
+
+        // Act
+        var act = () => dir.Delete();
+
+        // Assert
+        act.ShouldNotThrow();
+    }
+
+    [Fact]
+    public void Delete_ExistingDirectory_DeletesDirectory()
+    {
+        // Arrange
+        string path = "FileSystem/Physical";
+        var dir = new PhysicalDirectory(path).GetDirectory("delete-test");
+        dir.Create();
+        dir.Exists.ShouldBeTrue();
+
+        // Act
+        dir.Delete();
+
+        // Assert
+        dir.Exists.ShouldBeFalse();
+    }
+
+    [Fact]
     public void GetDirectory_ExistingDirectory_GetsDirectory()
     {
         // Arrange"
