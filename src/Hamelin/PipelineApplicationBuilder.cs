@@ -34,6 +34,8 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
             ContentRootPath = options.ContentRootPath,
             Configuration = new ConfigurationManager(),
         });
+
+        _innerBuilder.Logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
     }
 
     /// <inheritdoc />
