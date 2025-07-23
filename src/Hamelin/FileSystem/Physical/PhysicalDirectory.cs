@@ -12,7 +12,6 @@ internal class PhysicalDirectory(string path) : IDirectory
 
     public void Create()
     {
-        if (Exists) { return; }
         Directory.CreateDirectory(AbsolutePath);
     }
 
