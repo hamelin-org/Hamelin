@@ -1,12 +1,13 @@
 using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
+using Hamelin;
 
-namespace Hamelin.Extensions;
+// ReSharper disable once CheckNamespace
+namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
 /// Provides extension methods for registering pipeline steps in the service collection.
 /// </summary>
-public static class ServiceCollectionExtensions
+public static class HamelinServiceCollectionExtensions
 {
     /// <summary>
     /// Registers a step in the service collection.
