@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hamelin.Build", "Hamelin.Bu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hamelin", "..\src\Hamelin\Hamelin.csproj", "{74C93B8D-3477-4B4E-BE04-B6A79D2CF2D4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hamelin.Tests.Unit", "..\tests\Hamelin.Tests.Unit\Hamelin.Tests.Unit.csproj", "{A00ADBE2-B959-4D67-9D1D-A724BC62EB9D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{74C93B8D-3477-4B4E-BE04-B6A79D2CF2D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74C93B8D-3477-4B4E-BE04-B6A79D2CF2D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74C93B8D-3477-4B4E-BE04-B6A79D2CF2D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A00ADBE2-B959-4D67-9D1D-A724BC62EB9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A00ADBE2-B959-4D67-9D1D-A724BC62EB9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A00ADBE2-B959-4D67-9D1D-A724BC62EB9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A00ADBE2-B959-4D67-9D1D-A724BC62EB9D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
