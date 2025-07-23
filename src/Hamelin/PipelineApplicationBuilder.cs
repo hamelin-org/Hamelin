@@ -1,4 +1,3 @@
-using Hamelin.Extensions;
 using Hamelin.FileSystem;
 using Hamelin.FileSystem.Physical;
 using Hamelin.Internal;
@@ -54,17 +53,6 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
 
     /// <inheritdoc />
     public IServiceCollection Services => _innerBuilder.Services;
-
-    /// <summary>
-    /// Adds a step to the pipeline that will be run when the application is executed.
-    /// </summary>
-    /// <typeparam name="TStep"></typeparam>
-    /// <returns></returns>
-    public PipelineApplicationBuilder AddStep<TStep>() where TStep : class, IPipelineStep
-    {
-        Services.AddStep<TStep>();
-        return this;
-    }
 
     /// <summary>
     /// Builds the <see cref="PipelineApplication" />.
