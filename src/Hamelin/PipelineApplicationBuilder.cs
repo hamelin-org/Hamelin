@@ -32,12 +32,17 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
             { "Logging:LogLevel:Microsoft.Hosting.Lifetime", nameof(LogLevel.Warning) }
         });
 
+        // When left empty, the content root usually defaults to the current working directory.
+        // Since Hamelin will usually be run from a project/repository directory, it won't be able to
+        // find things like appsettings.json.
+        string contentRoot = options.ContentRootPath ?? AppContext.BaseDirectory;
+
         _innerBuilder = new HostApplicationBuilder(new HostApplicationBuilderSettings
         {
             Args = options.Args,
             ApplicationName = options.ApplicationName,
             EnvironmentName = options.EnvironmentName,
-            ContentRootPath = options.ContentRootPath,
+            ContentRootPath = contentRoot,
             Configuration = configuration,
         });
     }
