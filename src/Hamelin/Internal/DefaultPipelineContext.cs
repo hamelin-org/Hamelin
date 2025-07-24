@@ -1,5 +1,4 @@
 using Hamelin.FileSystem;
-using Microsoft.Extensions.Hosting;
 
 namespace Hamelin.Internal;
 
