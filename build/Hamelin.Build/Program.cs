@@ -16,6 +16,8 @@ builder.Services.AddOptions<BuildOptions>()
 
 var pipeline = builder.Build();
 
-pipeline.UseStep<CleanStep>();
+pipeline
+    .UseStep<CleanStep>()
+    .UseStep<FormatStep>();
 
 pipeline.Run();
