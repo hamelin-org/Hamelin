@@ -3,6 +3,7 @@ using Hamelin.Steps;
 using Hamelin.Tests.Unit.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Hamelin.Tests.Unit.Internal;
@@ -13,6 +14,7 @@ public class PipelineHostTests
     public async Task StartAsync_WithStopApplicationOnCompletion_StopsApplicationWhenFinished()
     {
         // Arrange
+        var logger = Substitute.For<ILogger<PipelineHost>>();
         var lifetime = Substitute.For<IHostApplicationLifetime>();
 
         var provider = Substitute.For<IPipelineStepProvider>();
@@ -27,7 +29,7 @@ public class PipelineHostTests
             StopApplicationOnCompletion = true
         };
 
-        var host = new PipelineHost(lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
+        var host = new PipelineHost(logger, lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
 
         // Act
         await host.StartAsync(CancellationToken.None);
@@ -40,6 +42,7 @@ public class PipelineHostTests
     public async Task StartAsync_WithoutStopApplicationOnCompletion_DoesNotStopApplicationWhenFinished()
     {
         // Arrange
+        var logger = Substitute.For<ILogger<PipelineHost>>();
         var lifetime = Substitute.For<IHostApplicationLifetime>();
 
         var provider = Substitute.For<IPipelineStepProvider>();
@@ -54,7 +57,7 @@ public class PipelineHostTests
             StopApplicationOnCompletion = false
         };
 
-        var host = new PipelineHost(lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
+        var host = new PipelineHost(logger, lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
 
         // Act
         await host.StartAsync(CancellationToken.None);
@@ -67,6 +70,7 @@ public class PipelineHostTests
     public async Task StartAsync_WithSteps_RunsStepsInOrder()
     {
         // Arrange
+        var logger = Substitute.For<ILogger<PipelineHost>>();
         var lifetime = Substitute.For<IHostApplicationLifetime>();
 
         var step1 = PipelineStepHelpers.CreateMock();
@@ -84,7 +88,7 @@ public class PipelineHostTests
 
         PipelineExecutionOptions pipelineExecutionOptions = new();
 
-        var host = new PipelineHost(lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
+        var host = new PipelineHost(logger, lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
 
         // Act
         await host.StartAsync(CancellationToken.None);

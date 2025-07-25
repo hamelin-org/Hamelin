@@ -45,6 +45,11 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
             ContentRootPath = contentRoot,
             Configuration = configuration,
         });
+
+        _innerBuilder.Services
+            .Configure<HostOptions>(o => o.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore);
+
+        _innerBuilder.Services.AddOptions<PipelineExecutionOptions>();
     }
 
     /// <inheritdoc />

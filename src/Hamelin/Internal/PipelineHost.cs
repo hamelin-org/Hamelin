@@ -1,6 +1,7 @@
 using Hamelin.Steps;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Hamelin.Internal;
@@ -8,10 +9,12 @@ namespace Hamelin.Internal;
 /// <summary>
 /// The hosted service that runs the pipeline.
 /// </summary>
+/// <param name="logger">The logger for the pipeline host.</param>
 /// <param name="lifetime">The application lifetime.</param>
 /// <param name="scopeFactory">The factory that will be used to scope each execution of the pipeline.</param>
 /// <param name="options">Options to configure the pipeline execution</param>
 internal class PipelineHost(
+    ILogger<PipelineHost> logger,
     IHostApplicationLifetime lifetime,
     IServiceScopeFactory scopeFactory,
     IOptions<PipelineExecutionOptions> options
@@ -49,7 +52,25 @@ internal class PipelineHost(
                 return;
             }
 
-            await step.Run(cancellationToken);
+            try
+            {
+                await step.Run(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                switch (options.Value.TerminationMode)
+                {
+                    case PipelineTerminationMode.StopOnUnhandledException:
+                        logger.LogCritical(ex, "Unhandled error during pipeline execution.");
+                        lifetime.StopApplication();
+                        throw;
+                    case PipelineTerminationMode.StopAfterAllSteps:
+                        logger.LogError(ex, "Unhandled error during pipeline execution.");
+                        break;
+                    default:
+                        throw;
+                }
+            }
         }
     }
 }
