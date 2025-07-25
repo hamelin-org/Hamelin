@@ -5,7 +5,8 @@ namespace Hamelin;
 /// <summary>
 /// Provides context for the pipeline execution.
 /// </summary>
-public interface IPipelineContext {
+public interface IPipelineContext
+{
     /// <summary>
     /// Gets the file system provider used by the pipeline.
     /// </summary>
