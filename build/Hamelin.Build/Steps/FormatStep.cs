@@ -22,11 +22,11 @@ public class FormatStep(ILogger<FormatStep> logger, IPipelineContext context) : 
 
         if (result.ExitCode == 0)
         {
-           logger.LogInformation("{StdOut}", stdOutBuffer);
+           logger.LogInformation("Output: {StdOut}", stdOutBuffer);
         }
         else
         {
-            logger.LogError("{StdErr}", stdErrBuffer);
+            logger.LogError("Error: {StdErr}", stdErrBuffer);
             throw new Exception($"Command {command} returned exit code {result.ExitCode}");
         }
     }
