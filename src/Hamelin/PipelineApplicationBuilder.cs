@@ -46,10 +46,12 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
             Configuration = configuration,
         });
 
+        // We have our own error handling in place for this.
         _innerBuilder.Services
             .Configure<HostOptions>(o => o.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore);
 
-        _innerBuilder.Services.AddOptions<PipelineExecutionOptions>();
+        _innerBuilder.Services
+            .AddOptions<PipelineExecutionOptions>();
     }
 
     /// <inheritdoc />
