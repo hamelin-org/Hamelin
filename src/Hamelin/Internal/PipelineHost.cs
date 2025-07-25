@@ -60,14 +60,13 @@ internal class PipelineHost(
             {
                 switch (options.Value.TerminationMode)
                 {
-                    case PipelineTerminationMode.StopOnUnhandledException:
-                        logger.LogCritical(ex, "Unhandled error during pipeline execution.");
-                        lifetime.StopApplication();
-                        throw;
                     case PipelineTerminationMode.StopAfterAllSteps:
-                        logger.LogError(ex, "Unhandled error during pipeline execution.");
+                        logger.LogError(ex, "Unhandled error during pipeline execution. Continuing...");
                         break;
+                    case PipelineTerminationMode.StopOnUnhandledException: // This is the default behaviour, so fall through to default case
                     default:
+                        logger.LogCritical(ex, "Unhandled error during pipeline execution. Exiting.");
+                        lifetime.StopApplication();
                         throw;
                 }
             }
