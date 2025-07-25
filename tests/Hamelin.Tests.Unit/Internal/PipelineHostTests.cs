@@ -144,7 +144,8 @@ public class PipelineHostTests
         await step3.DidNotReceive().Run(Arg.Any<CancellationToken>());
     }
 
-    [Fact] public async Task StartAsync_WithStopAfterAllSteps_StopsAfterAllSteps()
+    [Fact]
+    public async Task StartAsync_WithStopAfterAllSteps_StopsAfterAllSteps()
     {
         // Arrange
         var logger = Substitute.For<ILogger<PipelineHost>>();
