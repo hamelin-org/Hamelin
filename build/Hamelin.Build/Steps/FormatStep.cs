@@ -1,5 +1,6 @@
 using System.Text;
 using CliWrap;
+using CliWrap.EventStream;
 using Microsoft.Extensions.Logging;
 
 namespace Hamelin.Build.Steps;
@@ -18,16 +19,28 @@ public class FormatStep(ILogger<FormatStep> logger, IPipelineContext context) : 
             .WithValidation(CommandResultValidation.None);
 
         logger.LogInformation("Running command: {Command}", command);
-        var result = await command.ExecuteAsync(cancellationToken);
 
-        if (result.ExitCode == 0)
+        await foreach (var cmdEvent in command.ListenAsync(cancellationToken))
         {
-           logger.LogInformation("Output: {StdOut}", stdOutBuffer);
-        }
-        else
-        {
-            logger.LogError("Error: {StdErr}", stdErrBuffer);
-            throw new Exception($"Command {command} returned exit code {result.ExitCode}");
+            switch (cmdEvent)
+            {
+                case StartedCommandEvent started:
+                    logger.LogInformation("Process started; ID: {ProcessId}", started.ProcessId);
+                    break;
+                case StandardOutputCommandEvent stdOut:
+                    logger.LogInformation("{Output}", stdOut.Text);
+                    break;
+                case StandardErrorCommandEvent stdErr:
+                    logger.LogError("{Error}", stdErr.Text);
+                    break;
+                case ExitedCommandEvent exited:
+                    logger.LogInformation("Process exited; Code: {ExitCode}", exited.ExitCode);
+                    if (exited.ExitCode != 0)
+                    {
+                        throw new Exception($"Command {command} returned exit code {exited.ExitCode}");
+                    }
+                    break;
+            }
         }
     }
 }
