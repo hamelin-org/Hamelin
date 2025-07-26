@@ -13,7 +13,7 @@ public class CliWrapCommandRunner(ILogger<CliWrapCommandRunner> logger, IPipelin
             .WithWorkingDirectory(context.CurrentDirectory)
             .WithValidation(CommandResultValidation.None);
 
-        logger.LogInformation("Running command: {Command}", command);
+        logger.LogInformation("Running command: {Command}", cmd);
 
         await foreach (var cmdEvent in cmd.ListenAsync(cancellationToken))
         {
