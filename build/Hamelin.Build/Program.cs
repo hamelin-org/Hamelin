@@ -1,12 +1,15 @@
 ﻿using Hamelin;
 using Hamelin.Build;
+using Hamelin.Build.Services;
 using Hamelin.Build.Steps;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = PipelineApplication.CreateBuilder(args);
 
-builder.Services.AddStepsFromAssemblyContaining<Program>();
+builder.Services
+    .AddScoped<ICommandRunner, CliWrapCommandRunner>()
+    .AddStepsFromAssemblyContaining<Program>();
 
 builder.Services.AddOptions<BuildOptions>()
     .BindConfiguration("Build")
