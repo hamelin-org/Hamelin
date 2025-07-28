@@ -15,12 +15,16 @@ builder.Services.AddOptions<BuildOptions>()
     .BindConfiguration("Build")
     .Validate(b => !string.IsNullOrEmpty(b.ArtifactsDirectory))
     .Validate(b => !string.IsNullOrEmpty(b.TempDirectory))
+    .Validate(b => !string.IsNullOrEmpty(b.Configuration))
     .ValidateOnStart();
 
 var pipeline = builder.Build();
 
 pipeline
     .UseStep<CleanStep>()
-    .UseStep<FormatStep>();
+    .UseStep<FormatStep>()
+    .UseStep<RestoreStep>()
+    .UseStep<BuildStep>()
+    .UseStep<TestStep>();
 
 pipeline.Run();
