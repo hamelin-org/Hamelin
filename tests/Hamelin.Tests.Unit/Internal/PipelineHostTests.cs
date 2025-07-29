@@ -1,35 +1,25 @@
-using Hamelin.Internal;
-using Hamelin.Steps;
 using Hamelin.Tests.Unit.Helpers;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Hamelin.Tests.Unit.Internal;
 
 public class PipelineHostTests
 {
+    public PipelineHostTests()
+    {
+        Environment.ExitCode = 0;
+    }
+
     [Fact]
     public async Task StartAsync_WithStopApplicationOnCompletion_StopsApplicationWhenFinished()
     {
         // Arrange
-        var logger = Substitute.For<ILogger<PipelineHost>>();
         var lifetime = Substitute.For<IHostApplicationLifetime>();
 
-        var provider = Substitute.For<IPipelineStepProvider>();
-        var services = new ServiceCollection()
-            .AddSingleton(provider)
-            .BuildServiceProvider();
-
-        var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
-
-        PipelineExecutionOptions pipelineExecutionOptions = new()
-        {
-            StopApplicationOnCompletion = true
-        };
-
-        var host = new PipelineHost(logger, lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
+        var host = PipelineHostHelpers.CreateHost(
+            configure: options => options.StopApplicationOnCompletion = true,
+            lifetime: lifetime
+        );
 
         // Act
         await host.StartAsync(CancellationToken.None);
@@ -42,22 +32,12 @@ public class PipelineHostTests
     public async Task StartAsync_WithoutStopApplicationOnCompletion_DoesNotStopApplicationWhenFinished()
     {
         // Arrange
-        var logger = Substitute.For<ILogger<PipelineHost>>();
         var lifetime = Substitute.For<IHostApplicationLifetime>();
 
-        var provider = Substitute.For<IPipelineStepProvider>();
-        var services = new ServiceCollection()
-            .AddSingleton(provider)
-            .BuildServiceProvider();
-
-        var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
-
-        PipelineExecutionOptions pipelineExecutionOptions = new()
-        {
-            StopApplicationOnCompletion = false
-        };
-
-        var host = new PipelineHost(logger, lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
+        var host = PipelineHostHelpers.CreateHost(
+            configure: options => options.StopApplicationOnCompletion = false,
+            lifetime: lifetime
+        );
 
         // Act
         await host.StartAsync(CancellationToken.None);
@@ -70,25 +50,11 @@ public class PipelineHostTests
     public async Task StartAsync_WithSteps_RunsStepsInOrder()
     {
         // Arrange
-        var logger = Substitute.For<ILogger<PipelineHost>>();
-        var lifetime = Substitute.For<IHostApplicationLifetime>();
-
         var step1 = PipelineStepHelpers.CreateMock();
         var step2 = PipelineStepHelpers.CreateMock();
         var step3 = PipelineStepHelpers.CreateMock();
 
-        var provider = Substitute.For<IPipelineStepProvider>();
-        provider.GetSteps().Returns([step1, step2, step3]);
-
-        var services = new ServiceCollection()
-            .AddSingleton(provider)
-            .BuildServiceProvider();
-
-        var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
-
-        PipelineExecutionOptions pipelineExecutionOptions = new();
-
-        var host = new PipelineHost(logger, lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
+        var host = PipelineHostHelpers.CreateHost([step1, step2, step3]);
 
         // Act
         await host.StartAsync(CancellationToken.None);
@@ -103,36 +69,21 @@ public class PipelineHostTests
     }
 
     [Fact]
-    public async Task StartAsync_WithStopOnUnhandledException_StopsOnUnhandledsException()
+    public async Task StartAsync_WithStopOnUnhandledException_StopsOnUnhandledException()
     {
         // Arrange
-        var logger = Substitute.For<ILogger<PipelineHost>>();
-        var lifetime = Substitute.For<IHostApplicationLifetime>();
-
         var step1 = PipelineStepHelpers.CreateMock();
         var step2 = PipelineStepHelpers.CreateMock();
         step2.Run(Arg.Any<CancellationToken>()).ThrowsAsync(new Exception("Test"));
         var step3 = PipelineStepHelpers.CreateMock();
 
-        var provider = Substitute.For<IPipelineStepProvider>();
-        provider.GetSteps().Returns([step1, step2, step3]);
-
-        var services = new ServiceCollection()
-            .AddSingleton(provider)
-            .BuildServiceProvider();
-
-        var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
-
-        PipelineExecutionOptions pipelineExecutionOptions = new()
-        {
-            TerminationMode = PipelineTerminationMode.StopOnUnhandledException
-        };
-
-        var host = new PipelineHost(logger, lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
+        var host = PipelineHostHelpers.CreateHost(
+            steps: [step1, step2, step3],
+            configure: options => options.TerminationMode = PipelineTerminationMode.StopOnUnhandledException
+        );
 
         // Act
         var act = () => host.StartAsync(CancellationToken.None);
-
 
         // Assert
         await act.ShouldThrowAsync<Exception>();
@@ -148,29 +99,15 @@ public class PipelineHostTests
     public async Task StartAsync_WithStopAfterAllSteps_StopsAfterAllSteps()
     {
         // Arrange
-        var logger = Substitute.For<ILogger<PipelineHost>>();
-        var lifetime = Substitute.For<IHostApplicationLifetime>();
-
         var step1 = PipelineStepHelpers.CreateMock();
         var step2 = PipelineStepHelpers.CreateMock();
         step2.Run(Arg.Any<CancellationToken>()).ThrowsAsync(new Exception("Test"));
         var step3 = PipelineStepHelpers.CreateMock();
 
-        var provider = Substitute.For<IPipelineStepProvider>();
-        provider.GetSteps().Returns([step1, step2, step3]);
-
-        var services = new ServiceCollection()
-            .AddSingleton(provider)
-            .BuildServiceProvider();
-
-        var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(services);
-
-        PipelineExecutionOptions pipelineExecutionOptions = new()
-        {
-            TerminationMode = PipelineTerminationMode.StopAfterAllSteps
-        };
-
-        var host = new PipelineHost(logger, lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
+        var host = PipelineHostHelpers.CreateHost(
+            steps: [step1, step2, step3],
+            configure: options => options.TerminationMode = PipelineTerminationMode.StopAfterAllSteps
+        );
 
         // Act
         var act = () => host.StartAsync(CancellationToken.None);
@@ -183,5 +120,196 @@ public class PipelineHostTests
             step2.Run(Arg.Any<CancellationToken>());
             step3.Run(Arg.Any<CancellationToken>());
         });
+    }
+
+    [Fact]
+    public async Task StartAsync_AutoExitCodesAndTokenCancelled_SetsExitCodeToCancelled()
+    {
+        // Arrange
+        var step1 = PipelineStepHelpers.CreateMock();
+
+        var host = PipelineHostHelpers.CreateHost([step1]);
+
+        var cts = new CancellationTokenSource();
+        await cts.CancelAsync();
+
+        // Act
+        await host.StartAsync(cts.Token);
+
+        // Assert
+        await step1.DidNotReceive().Run(Arg.Any<CancellationToken>());
+        Environment.ExitCode.ShouldBe(PipelineExitCodes.StoppedAfterCancel);
+    }
+
+    [Fact]
+    public async Task StartAsync_AutoExitCodesAndStopOnUnhandledException_SetsExitCodeToStoppedOnError()
+    {
+        // Arrange
+        var step1 = PipelineStepHelpers.CreateMock();
+        var step2 = PipelineStepHelpers.CreateMock();
+        step2.Run(Arg.Any<CancellationToken>()).ThrowsAsync(new Exception("Test"));
+        var step3 = PipelineStepHelpers.CreateMock();
+
+        var host = PipelineHostHelpers.CreateHost(
+            steps: [step1, step2, step3],
+            configure: options => options.TerminationMode = PipelineTerminationMode.StopOnUnhandledException
+        );
+
+        // Act
+        var act = () => host.StartAsync(CancellationToken.None);
+
+        // Assert
+        await act.ShouldThrowAsync<Exception>();
+        Environment.ExitCode.ShouldBe(PipelineExitCodes.StoppedOnError);
+    }
+
+    [Fact]
+    public async Task StartAsync_AutoExitCodesAndStopAfterAllSteps_SetsExitCodeToContinuedAfterError()
+    {
+        // Arrange
+        var step1 = PipelineStepHelpers.CreateMock();
+        var step2 = PipelineStepHelpers.CreateMock();
+        step2.Run(Arg.Any<CancellationToken>()).ThrowsAsync(new Exception("Test"));
+        var step3 = PipelineStepHelpers.CreateMock();
+
+        var host = PipelineHostHelpers.CreateHost(
+            steps: [step1, step2, step3],
+            configure: options => options.TerminationMode = PipelineTerminationMode.StopAfterAllSteps
+        );
+
+        // Act
+        var act = () => host.StartAsync(CancellationToken.None);
+
+        // Assert
+        await act.ShouldNotThrowAsync();
+        Environment.ExitCode.ShouldBe(PipelineExitCodes.ContinuedAfterError);
+    }
+
+    [Fact]
+    public async Task StartAsync_NoAutoExitCodesAndTokenCancelled_DoesNotSetExitCode()
+    {
+        // Arrange
+        var step1 = PipelineStepHelpers.CreateMock();
+
+        var host = PipelineHostHelpers.CreateHost(
+            steps: [step1],
+            options => options.EnableAutomaticExitCodes = false
+        );
+
+        var cts = new CancellationTokenSource();
+        await cts.CancelAsync();
+
+        // Act
+        await host.StartAsync(cts.Token);
+
+        // Assert
+        await step1.DidNotReceive().Run(Arg.Any<CancellationToken>());
+        Environment.ExitCode.ShouldBe(PipelineExitCodes.Success);
+    }
+
+    [Fact]
+    public async Task StartAsync_NoAutoExitCodesAndStopOnUnhandledException_DoesNotSetExitCode()
+    {
+        // Arrange
+        var step1 = PipelineStepHelpers.CreateMock();
+        var step2 = PipelineStepHelpers.CreateMock();
+        step2.Run(Arg.Any<CancellationToken>()).ThrowsAsync(new Exception("Test"));
+        var step3 = PipelineStepHelpers.CreateMock();
+
+        var host = PipelineHostHelpers.CreateHost(
+            steps: [step1, step2, step3],
+            configure: options =>
+            {
+                options.EnableAutomaticExitCodes = false;
+                options.TerminationMode = PipelineTerminationMode.StopOnUnhandledException;
+            });
+
+        // Act
+        var act = () => host.StartAsync(CancellationToken.None);
+
+        // Assert
+        await act.ShouldThrowAsync<Exception>();
+        Environment.ExitCode.ShouldBe(PipelineExitCodes.Success);
+    }
+
+    [Fact]
+    public async Task StartAsync_NoAutoExitCodesAndStopAfterAllSteps_DoesNotSetExitCode()
+    {
+        // Arrange
+        var step1 = PipelineStepHelpers.CreateMock();
+        var step2 = PipelineStepHelpers.CreateMock();
+        step2.Run(Arg.Any<CancellationToken>()).ThrowsAsync(new Exception("Test"));
+        var step3 = PipelineStepHelpers.CreateMock();
+
+        var host = PipelineHostHelpers.CreateHost(
+            steps: [step1, step2, step3],
+            configure: options =>
+            {
+                options.EnableAutomaticExitCodes = false;
+                options.TerminationMode = PipelineTerminationMode.StopAfterAllSteps;
+            });
+
+        // Act
+        var act = () => host.StartAsync(CancellationToken.None);
+
+        // Assert
+        await act.ShouldNotThrowAsync();
+        Environment.ExitCode.ShouldBe(PipelineExitCodes.Success);
+    }
+
+    [Fact]
+    public async Task StartAsync_CustomExitCode_SetsExitCodeToCustomExitCode()
+    {
+        // Arrange
+        var context = Substitute.For<IPipelineContext>();
+
+        var step1 = PipelineStepHelpers.CreateMock();
+        step1
+            .When(s => s.Run(Arg.Any<CancellationToken>()))
+            .Do((i) =>
+            {
+                context.ExitCode = 1234;
+            });
+
+        var host = PipelineHostHelpers.CreateHost(
+            steps: [step1],
+            context: context
+        );
+
+        // Act
+        var act = () => host.StartAsync(CancellationToken.None);
+
+        // Assert
+        await act.ShouldNotThrowAsync();
+        Environment.ExitCode.ShouldBe(1234);
+    }
+
+    [Fact]
+    public async Task StartAsync_CustomExitCode_DoesNotOverrideAutomaticCode()
+    {
+        // Arrange
+        var context = Substitute.For<IPipelineContext>();
+
+        var step1 = PipelineStepHelpers.CreateMock();
+        step1
+            .When(s => s.Run(Arg.Any<CancellationToken>()))
+            .Do((i) =>
+            {
+                context.ExitCode = 1234;
+            });
+        var step2 = PipelineStepHelpers.CreateMock();
+        step2.Run(Arg.Any<CancellationToken>()).ThrowsAsync(new Exception("Test"));
+
+        var host = PipelineHostHelpers.CreateHost(
+            steps: [step1, step2],
+            context: context
+        );
+
+        // Act
+        var act = () => host.StartAsync(CancellationToken.None);
+
+        // Assert
+        await act.ShouldThrowAsync<Exception>();
+        Environment.ExitCode.ShouldBe(PipelineExitCodes.StoppedOnError);
     }
 }

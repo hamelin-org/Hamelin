@@ -21,4 +21,10 @@ public interface IPipelineContext
     /// Gets the current working directory.
     /// </summary>
     string CurrentDirectory { get; }
+
+    /// <summary>
+    /// Gets or sets the exit code to use when the pipeline terminates.
+    /// If <c>null</c>, then Hamelin will determine the exit code, based on <see cref="PipelineExecutionOptions.EnableAutomaticExitCodes" />.
+    /// </summary>
+    int? ExitCode { get; set; }
 }
