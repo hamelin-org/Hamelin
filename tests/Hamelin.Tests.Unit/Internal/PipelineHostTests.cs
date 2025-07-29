@@ -138,7 +138,7 @@ public class PipelineHostTests
 
         // Assert
         await step1.DidNotReceive().Run(Arg.Any<CancellationToken>());
-        Environment.ExitCode.ShouldBe(PipelineExitCodes.STOPPED_AFTER_CANCEL);
+        Environment.ExitCode.ShouldBe(PipelineExitCodes.StoppedAfterCancel);
     }
 
     [Fact]
@@ -160,7 +160,7 @@ public class PipelineHostTests
 
         // Assert
         await act.ShouldThrowAsync<Exception>();
-        Environment.ExitCode.ShouldBe(PipelineExitCodes.STOPPED_ON_ERROR);
+        Environment.ExitCode.ShouldBe(PipelineExitCodes.StoppedOnError);
     }
 
     [Fact]
@@ -182,7 +182,7 @@ public class PipelineHostTests
 
         // Assert
         await act.ShouldNotThrowAsync();
-        Environment.ExitCode.ShouldBe(PipelineExitCodes.CONTINUED_AFTER_ERROR);
+        Environment.ExitCode.ShouldBe(PipelineExitCodes.ContinuedAfterError);
     }
 
     [Fact]
@@ -204,7 +204,7 @@ public class PipelineHostTests
 
         // Assert
         await step1.DidNotReceive().Run(Arg.Any<CancellationToken>());
-        Environment.ExitCode.ShouldBe(PipelineExitCodes.SUCCESS);
+        Environment.ExitCode.ShouldBe(PipelineExitCodes.Success);
     }
 
     [Fact]
@@ -229,7 +229,7 @@ public class PipelineHostTests
 
         // Assert
         await act.ShouldThrowAsync<Exception>();
-        Environment.ExitCode.ShouldBe(PipelineExitCodes.SUCCESS);
+        Environment.ExitCode.ShouldBe(PipelineExitCodes.Success);
     }
 
     [Fact]
@@ -254,7 +254,7 @@ public class PipelineHostTests
 
         // Assert
         await act.ShouldNotThrowAsync();
-        Environment.ExitCode.ShouldBe(PipelineExitCodes.SUCCESS);
+        Environment.ExitCode.ShouldBe(PipelineExitCodes.Success);
     }
 
     [Fact]
@@ -310,6 +310,6 @@ public class PipelineHostTests
 
         // Assert
         await act.ShouldThrowAsync<Exception>();
-        Environment.ExitCode.ShouldBe(PipelineExitCodes.STOPPED_ON_ERROR);
+        Environment.ExitCode.ShouldBe(PipelineExitCodes.StoppedOnError);
     }
 }

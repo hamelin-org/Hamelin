@@ -2,8 +2,8 @@ namespace Hamelin;
 
 internal static class PipelineExitCodes
 {
-    public const int SUCCESS = 0;
-    public const int STOPPED_ON_ERROR = -1;
-    public const int CONTINUED_AFTER_ERROR = -2;
-    public const int STOPPED_AFTER_CANCEL = -3;
+    public const int Success = 0;
+    public const int StoppedOnError = -1;
+    public const int ContinuedAfterError = -2;
+    public const int StoppedAfterCancel = -3;
 }

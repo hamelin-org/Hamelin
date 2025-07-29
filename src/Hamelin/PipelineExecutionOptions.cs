@@ -16,7 +16,7 @@ public class PipelineExecutionOptions
     public PipelineTerminationMode TerminationMode { get; set; } = PipelineTerminationMode.StopOnUnhandledException;
 
     /// <summary>
-    /// If `true` then the pipeline
+    /// If `true` then the pipeline will set the exit code automatically on failure.
     /// </summary>
     public bool EnableAutomaticExitCodes { get; set; } = true;
 }

@@ -33,7 +33,7 @@ internal class PipelineHost(
             // The only way we reach this is when the pipeline terminates early due to an unhandled error.
             if (options.Value.EnableAutomaticExitCodes)
             {
-                Environment.ExitCode = PipelineExitCodes.STOPPED_ON_ERROR;
+                Environment.ExitCode = PipelineExitCodes.StoppedOnError;
             }
             throw;
         }
@@ -55,12 +55,12 @@ internal class PipelineHost(
         var stepProvider = scope.ServiceProvider.GetRequiredService<IPipelineStepProvider>();
         var steps = stepProvider.GetSteps();
 
-        int automaticExitCode = PipelineExitCodes.SUCCESS;
+        int automaticExitCode = PipelineExitCodes.Success;
         foreach (var step in steps)
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                automaticExitCode = PipelineExitCodes.STOPPED_AFTER_CANCEL;
+                automaticExitCode = PipelineExitCodes.StoppedAfterCancel;
                 break;
             }
 
@@ -74,7 +74,7 @@ internal class PipelineHost(
                 {
                     case PipelineTerminationMode.StopAfterAllSteps:
                         logger.LogError(ex, "Unhandled error during pipeline execution. Continuing...");
-                        automaticExitCode = PipelineExitCodes.CONTINUED_AFTER_ERROR;
+                        automaticExitCode = PipelineExitCodes.ContinuedAfterError;
                         break;
                     case PipelineTerminationMode.StopOnUnhandledException: // This is the default behaviour, so fall through to default case
                     default:
@@ -85,10 +85,10 @@ internal class PipelineHost(
             }
         }
 
-        if (options.Value.EnableAutomaticExitCodes && automaticExitCode != PipelineExitCodes.SUCCESS)
+        if (options.Value.EnableAutomaticExitCodes && automaticExitCode != PipelineExitCodes.Success)
         {
             return automaticExitCode;
         }
-        return context.ExitCode ?? PipelineExitCodes.SUCCESS;
+        return context.ExitCode ?? PipelineExitCodes.Success;
     }
 }
