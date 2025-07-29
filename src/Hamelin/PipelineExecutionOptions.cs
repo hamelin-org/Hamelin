@@ -6,12 +6,17 @@ namespace Hamelin;
 public class PipelineExecutionOptions
 {
     /// <summary>
-    /// If `true` then application termination will be requested the pipeline run is completed
+    /// If `true` then application termination will be requested when the pipeline run is completed.
     /// </summary>
-    public bool StopApplicationOnCompletion { get; init; } = true;
+    public bool StopApplicationOnCompletion { get; set; } = true;
 
     /// <summary>
     /// Controls what causes the pipeline to terminate early.
     /// </summary>
     public PipelineTerminationMode TerminationMode { get; set; } = PipelineTerminationMode.StopOnUnhandledException;
+
+    /// <summary>
+    /// If `true` then the pipeline
+    /// </summary>
+    public bool EnableAutomaticExitCodes { get; set; } = true;
 }
