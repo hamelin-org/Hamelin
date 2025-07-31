@@ -16,6 +16,7 @@ builder.Services.AddOptions<BuildOptions>()
     .Validate(b => !string.IsNullOrEmpty(b.ArtifactsDirectory))
     .Validate(b => !string.IsNullOrEmpty(b.TempDirectory))
     .Validate(b => !string.IsNullOrEmpty(b.Configuration))
+    .Validate(b => !string.IsNullOrEmpty(b.ProjectFile))
     .ValidateOnStart();
 
 var pipeline = builder.Build();
@@ -23,6 +24,8 @@ var pipeline = builder.Build();
 pipeline
     .UseStep<CleanStep>()
     .UseStep<FormatStep>()
+    .UseStep<ExtractProjectStep>()
+    .UseStep<VersionStep>()
     .UseStep<RestoreStep>()
     .UseStep<BuildStep>()
     .UseStep<TestStep>();
