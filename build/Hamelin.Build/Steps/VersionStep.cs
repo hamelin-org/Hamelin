@@ -23,14 +23,7 @@ public class VersionStep(
             throw new Exception("Project info not found in state.");
         }
 
-        PackageSourceCredential credentials = new(
-            options.Value.NuGetFeed,
-            "dummy",
-            "",
-            true,
-            null
-        );
-
+        PackageSourceCredential credentials = new(options.Value.NuGetFeed, "dummy", "", true, null);
         var packageSource = new PackageSource(options.Value.NuGetFeed) { Credentials = credentials };
         SourceRepository repository = Repository.Factory.GetCoreV3(packageSource);
         var resource = await repository.GetResourceAsync<FindPackageByIdResource>(cancellationToken);
