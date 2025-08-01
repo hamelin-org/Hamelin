@@ -93,7 +93,7 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
 
     private void ApplyServices(IServiceCollection services)
     {
-        services.TryAddScoped<IFileSystem>(_ => new PhysicalFileSystem(_innerBuilder.Environment.ContentRootPath));
+        services.TryAddScoped<IFileSystem>(_ => new PhysicalFileSystem(System.Environment.CurrentDirectory));
         services.TryAddScoped<IPipelineState, DefaultPipelineState>();
         services.TryAddScoped<IPipelineContext, DefaultPipelineContext>();
 
