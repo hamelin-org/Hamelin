@@ -5,9 +5,6 @@ on:
     branches:
       - main
 
-env:
-  configuration: Release
-
 jobs:
   build:
     name: Build and Test
@@ -16,14 +13,5 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Restore dependencies
-        run: dotnet restore
-
-      - name: Format code
-        run: dotnet format --no-restore --verify-no-changes
-
-      - name: Build project
-        run: dotnet build --no-restore --configuration $configuration
-
-      - name: Run tests
-        run: dotnet test --no-build
+      - name: Run pipeline
+        run: dotnet run --project ./build/Hamelin.Build/Hamelin.Build.csproj
