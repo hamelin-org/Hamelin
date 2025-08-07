@@ -1,22 +1,30 @@
 using Hamelin.Steps;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Hamelin.Tests.Unit.Steps;
 
-public class PipelineStepCollectionTests
+public class PipelineStepProviderTests
 {
     [Fact]
     public void GetSteps_WithSteps_ReturnsCorrectSteps()
     {
         // Arrange
+        var services = new ServiceCollection()
+            .AddStep<DummyStep1>()
+            .AddStep<DummyStep2>()
+            .BuildServiceProvider();
+
         var collection = new PipelineStepCollection();
         collection.AddStep<DummyStep1>();
         collection.AddStep<DummyStep2>();
 
+        var provider = new PipelineStepProvider(collection, services);
+
         // Act
-        var steps = collection.GetSteps();
+        var steps = provider.GetSteps().ToList();
 
         // Assert
-        steps.ShouldBeEquivalentTo(new List<Type>() { typeof(DummyStep1), typeof(DummyStep2) });
+        steps.ShouldBeOfTypes(typeof(DummyStep1), typeof(DummyStep2));
     }
 
     private class DummyStep1 : IPipelineStep

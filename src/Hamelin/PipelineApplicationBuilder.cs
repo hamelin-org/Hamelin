@@ -101,9 +101,8 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
         bool hasProvider = services.Any(d => d.ServiceType == typeof(IPipelineStepProvider));
         if (!hasProvider)
         {
-            services.TryAddSingleton<PipelineStepCollection>();
-            services.TryAddSingleton<IPipelineStepCollector>(sp => sp.GetRequiredService<PipelineStepCollection>());
-            services.TryAddSingleton<IPipelineStepProvider>(sp => sp.GetRequiredService<PipelineStepCollection>());
+            services.TryAddSingleton<IPipelineStepCollection, PipelineStepCollection>();
+            services.TryAddScoped<IPipelineStepProvider, PipelineStepProvider>();
         }
 
         // This is the service responsible for running the pipeline.

@@ -28,7 +28,7 @@ public class PipelineApplicationTests
     public void UseStep_AddsStepToCollector()
     {
         // Arrange
-        var collector = Substitute.For<IPipelineStepCollector>();
+        var collector = Substitute.For<IPipelineStepCollection>();
 
         var builder = PipelineApplication.CreateBuilder();
         builder.Services.AddSingleton(collector);
