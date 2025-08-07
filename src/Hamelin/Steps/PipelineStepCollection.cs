@@ -1,15 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace Hamelin.Steps;
 
-internal class PipelineStepCollection(IServiceProvider services) : IPipelineStepCollector, IPipelineStepProvider
+internal class PipelineStepCollection : List<Type>, IPipelineStepCollector
 {
-    private readonly List<Type> _steps = [];
-
-    public void AddStep<TStep>() where TStep : class, IPipelineStep
-    {
-        _steps.Add(typeof(TStep));
-    }
-
-    public IEnumerable<IPipelineStep> GetSteps() => _steps.Select(stepType => (IPipelineStep)services.GetRequiredService(stepType));
+    public void AddStep<TStep>() where TStep : class, IPipelineStep => Add(typeof(TStep));
 }
