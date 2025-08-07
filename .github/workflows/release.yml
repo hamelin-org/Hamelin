@@ -16,5 +16,4 @@ jobs:
         run: dotnet run --project ./build/Hamelin.Build/Hamelin.Build.csproj
         env:
           Mode: Release
-          Build__NuGetFeed: https://int.nugettest.org
-          Build__NuGetApiKey: ${{ secrets.NUGET_TEST_API_KEY }}
+          Build__NuGetApiKey: ${{ secrets.NUGET_API_KEY }}
