@@ -11,6 +11,7 @@
     <PackageProjectUrl>https://github.com/hamelin-org/Hamelin</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <LicenseExpression>MIT</LicenseExpression>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/hamelin-org/Hamelin.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Version>0.0.1</Version>

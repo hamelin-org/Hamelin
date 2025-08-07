@@ -1,9 +1,8 @@
-name: Pull Request
+name: Release
 
 on:
-  pull_request:
-    branches:
-      - main
+  release:
+    types: [released]
 
 jobs:
   build:
@@ -16,4 +15,6 @@ jobs:
       - name: Run pipeline
         run: dotnet run --project ./build/Hamelin.Build/Hamelin.Build.csproj
         env:
-          Mode: PullRequest
+          Mode: Release
+          Build__NuGetFeed: https://int.nugettest.org
+          Build__NuGetApiKey: ${{ secrets.NUGET_TEST_API_KEY }}
