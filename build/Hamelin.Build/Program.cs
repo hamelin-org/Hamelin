@@ -21,13 +21,29 @@ builder.Services.AddOptions<BuildOptions>()
 
 var pipeline = builder.Build();
 
-pipeline
-    .UseStep<CleanStep>()
-    .UseStep<FormatStep>()
-    .UseStep<ExtractProjectStep>()
-    .UseStep<VersionStep>()
-    .UseStep<RestoreStep>()
-    .UseStep<BuildStep>()
-    .UseStep<TestStep>();
+string? mode = builder.Configuration["Mode"];
+switch (mode)
+{
+    case "PullRequest":
+        pipeline
+            .UseStep<CleanStep>()
+            .UseStep<FormatStep>()
+            .UseStep<ExtractProjectStep>()
+            .UseStep<VersionStep>()
+            .UseStep<RestoreStep>()
+            .UseStep<BuildStep>()
+            .UseStep<TestStep>();
+        break;
+    case "Release":
+        pipeline
+            .UseStep<CleanStep>()
+            .UseStep<RestoreStep>()
+            .UseStep<BuildStep>()
+            .UseStep<PackStep>()
+            .UseStep<PublishStep>();
+        break;
+    default:
+        throw new InvalidOperationException($"Unknown mode: {mode}");
+}
 
 pipeline.Run();
