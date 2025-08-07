@@ -42,7 +42,7 @@ public class PipelineApplication : IHost
         {
             throw new InvalidOperationException("This method of step registration is not supported when a custom IPipelineStepProvider has been configured.");
         }
-        collector.Add(typeof(TStep));
+        collector.AddStep<TStep>();
         return this;
     }
 
