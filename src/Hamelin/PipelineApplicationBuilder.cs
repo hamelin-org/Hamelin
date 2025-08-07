@@ -101,7 +101,7 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
         bool hasProvider = services.Any(d => d.ServiceType == typeof(IPipelineStepProvider));
         if (!hasProvider)
         {
-            services.TryAddSingleton<IPipelineStepCollector, PipelineStepCollection>();
+            services.TryAddSingleton<PipelineStepCollection>();
             services.TryAddScoped<IPipelineStepProvider, PipelineStepProvider>();
         }
 
