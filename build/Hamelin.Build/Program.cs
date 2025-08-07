@@ -21,14 +21,12 @@ builder.Services.AddOptions<BuildOptions>()
 
 var pipeline = builder.Build();
 
-pipeline
-    .UseStep<CleanStep>();
-
 string? mode = builder.Configuration["Mode"];
 switch (mode)
 {
     case "PullRequest":
         pipeline
+            .UseStep<CleanStep>()
             .UseStep<FormatStep>()
             .UseStep<ExtractProjectStep>()
             .UseStep<VersionStep>()
@@ -38,6 +36,7 @@ switch (mode)
         break;
     case "Release":
         pipeline
+            .UseStep<CleanStep>()
             .UseStep<RestoreStep>()
             .UseStep<BuildStep>()
             .UseStep<PackStep>()
