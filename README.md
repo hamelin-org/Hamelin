@@ -44,6 +44,8 @@ pipeline
 await pipeline.RunAsync();
 ```
 
+Unlike a normal ASP.NET application, a Hamelin pipeline will terminate after the pipeline has been run, so the console application will exit after the `Run`/`RunAsync` method completes.
+
 ### Dependency Injection
 
 Hamelin leverages the built-in dependency injection system in .NET. You can register your steps and any other services you need in the `IServiceCollection` during the setup phase. This allows you to inject dependencies into your pipeline steps, making them more modular and testable.
