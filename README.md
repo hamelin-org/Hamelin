@@ -134,7 +134,13 @@ public class GetProjectInfo(ILogger<StoreProjectInfo> logger, IPipelineContext c
 
 ### Logging
 
+Hamelin uses the built-in logging system in .NET. You can configure logging during the setup phase using the `ILoggingBuilder` interface. This allows you to log messages from your pipeline steps, which can be useful for debugging and monitoring.
+
+By default, Hamelin will log messages to the console using a custom formatter, but you can configure it to log to other providers like files, databases, or external services.
+
 ### Configuration
+
+Hamelin supports configuration through the `IConfiguration` interface, allowing you to bind configuration settings to your pipeline as you would for other .NET apps. By default, environment variables, `appsettings.json` and `appsettings.{Environment}.json` are all loaded, just as they are in a typical ASP.NET Core application, but this behavior can be customized to load configuration from elsewhere, such as Azure App Configuration.
 
 ## Advanced Usage
 
