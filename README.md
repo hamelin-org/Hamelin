@@ -154,8 +154,10 @@ When `PipelineExecutionOptions.EnableAutomaticExitCodes` is set to `true` (the d
 
 When `PipelineExecutionOptions.EnableAutomaticExitCodes` is set to `false`, the value in `IPipelineContext.ExitCode` will always be used, defaulting to `0` if it is `null`.
 
-```csharp
-
 ### Termination Modes
 
+By default, Hamelin will stop executing steps as soon as one of them fails, and the exception will be propagated, but this behavior can be customized using the `PipelineExecutionOptions.TerminationMode` property. When set to `PipelineTerminationMode.StopAfterAllSteps`, the pipeline will continue executing steps, and any unhandled errors will be logged.
+
 ### Dependency Scopes
+
+Each pipeline execution is run inside its own dependency scope, similar to a web request in ASP.NET. This means that services registered as `Scoped` will be created and disposed of for each pipeline run, while `Singleton` services will be shared across all runs. This allows you to maintain state within a single pipeline execution without affecting other executions in advanced cases where a pipeline is run multiple times.
