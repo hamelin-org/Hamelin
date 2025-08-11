@@ -148,6 +148,14 @@ Hamelin supports configuration through the `IConfiguration` interface, allowing 
 
 ### Exit Codes
 
+Custom exit codes can be set for the pipeline using the `IPipelineContext.ExitCode` property. This allows you to indicate the success or failure of the pipeline execution.
+
+When `PipelineExecutionOptions.EnableAutomaticExitCodes` is set to `true` (the default), Hamelin will automatically set the exit code based on the success or failure of the pipeline steps. If a step fails, the exit code will be set to a non-zero value, based on the termination mode, indicating an error. If all steps succeed, the exit code will be set to zero, or use whatever value has been set in `IPipelineContext.ExitCode`.
+
+When `PipelineExecutionOptions.EnableAutomaticExitCodes` is set to `false`, the value in `IPipelineContext.ExitCode` will always be used, defaulting to `0` if it is `null`.
+
+```csharp
+
 ### Termination Modes
 
 ### Dependency Scopes
