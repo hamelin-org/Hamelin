@@ -11,6 +11,7 @@ var builder = PipelineApplication.CreateBuilder(args);
 
 builder.Services
     .AddScoped<ICommandRunner, CliWrapCommandRunner>()
+    .AddSingleton<IExternalScopeProvider, Esp>()
     .AddGitHubActionsRuntime()
     .AddStepsFromAssemblyContaining<Program>();
 
