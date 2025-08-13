@@ -1,5 +1,6 @@
 using Hamelin.Build.Helpers;
 using Hamelin.Build.Models;
+using Hamelin.Runtimes.GitHubActions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NuGet.Configuration;

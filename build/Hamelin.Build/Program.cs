@@ -15,7 +15,7 @@ builder.Logging
 
 builder.Services
     .AddScoped<ICommandRunner, CliWrapCommandRunner>()
-    .AddSingleton<IExternalScopeProvider, Esp>()
+    //.AddSingleton<IExternalScopeProvider, Esp>()s
     .AddGitHubActionsRuntime()
     .AddStepsFromAssemblyContaining<Program>();
 
