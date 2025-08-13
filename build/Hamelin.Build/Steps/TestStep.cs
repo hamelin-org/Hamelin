@@ -18,12 +18,16 @@ public class TestStep(
             cancellationToken
         );
 
-        gha.SetJobSummary(
-            """
-            ## Build Summary
+        string summary = """
+                         ## Build Summary
 
-            Build completed successfully.
-            """
+                         Build completed successfully.
+                         """;
+
+        await File.WriteAllTextAsync(
+            path: Environment.GetEnvironmentVariable("GITHUB_STEP_SUMMARY")!,
+            contents: summary,
+            cancellationToken: cancellationToken
         );
     }
 }
