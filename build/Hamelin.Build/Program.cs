@@ -2,14 +2,19 @@
 using Hamelin.Build;
 using Hamelin.Build.Services;
 using Hamelin.Build.Steps;
+using Hamelin.Runtimes.GitHubActions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 var builder = PipelineApplication.CreateBuilder(args);
 
 builder.Services
     .AddScoped<ICommandRunner, CliWrapCommandRunner>()
+    .AddGitHubActionsRuntime()
     .AddStepsFromAssemblyContaining<Program>();
+
+builder.Logging.AddSimpleConsole();
 
 builder.Services.AddOptions<BuildOptions>()
     .BindConfiguration("Build")
