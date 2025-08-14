@@ -8,10 +8,6 @@ public class CleanStep(ILogger<CleanStep> logger, IOptions<BuildOptions> options
     public Task Run(CancellationToken cancellationToken = default)
     {
         logger.LogInformation("Cleaning temp and artifact directories.");
-
-        logger.LogWarning("TEST WARNING!");
-        logger.LogError(new Exception("Test error"), "TEST Error!");
-
         var cd = context.FileSystem.CurrentDirectory;
         cd.GetDirectory(options.Value.ArtifactsDirectory).Delete();
         cd.GetDirectory(options.Value.TempDirectory).Delete();
