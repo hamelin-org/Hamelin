@@ -5,17 +5,11 @@ using Hamelin.Build.Steps;
 using Hamelin.Runtimes.GitHubActions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 var builder = PipelineApplication.CreateBuilder(args);
 
-// Remove the default logger so we only get the GHA output.
-builder.Logging
-    .ClearProviders();
-
 builder.Services
     .AddScoped<ICommandRunner, CliWrapCommandRunner>()
-    //.AddSingleton<IExternalScopeProvider, Esp>()s
     .AddGitHubActionsRuntime()
     .AddStepsFromAssemblyContaining<Program>();
 
