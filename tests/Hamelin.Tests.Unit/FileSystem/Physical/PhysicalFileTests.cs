@@ -44,6 +44,32 @@ public class PhysicalFileTests
     }
 
     [Fact]
+    public void NameWithoutExtension_ShouldBeFileNameWithoutExtension()
+    {
+        // Arrange
+        string path = "FileSystem/Physical/TestFile.txt";
+
+        // Act
+        var file = new PhysicalFile(path);
+
+        // Assert
+        file.NameWithoutExtension.ShouldBe("TestFile");
+    }
+
+    [Fact]
+    public void Extension_ShouldBeFileExtension()
+    {
+        // Arrange
+        string path = "FileSystem/Physical/TestFile.txt";
+
+        // Act
+        var file = new PhysicalFile(path);
+
+        // Assert
+        file.Extension.ShouldBe(".txt");
+    }
+
+    [Fact]
     public async Task OpenRead_ExistingFile_ShouldAllowRead()
     {
         // Arrange

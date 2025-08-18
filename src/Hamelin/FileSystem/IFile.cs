@@ -11,6 +11,16 @@ public interface IFile
     string Name { get; }
 
     /// <summary>
+    /// Gets the name of the file, excluding the extension.
+    /// </summary>
+    string NameWithoutExtension { get; }
+
+    /// <summary>
+    ///
+    /// </summary>
+    string Extension { get; }
+
+    /// <summary>
     /// Gets the full path to the file.
     /// </summary>
     string AbsolutePath { get; }
