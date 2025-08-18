@@ -16,7 +16,7 @@ public interface IFile
     string NameWithoutExtension { get; }
 
     /// <summary>
-    ///
+    /// Gets extension part of the file's name, including the separator character (usually a period).
     /// </summary>
     string Extension { get; }
 
