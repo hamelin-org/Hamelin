@@ -9,4 +9,9 @@ public interface IFileSystem
     /// Gets the current working directory.
     /// </summary>
     IDirectory CurrentDirectory { get; }
+
+    /// <summary>
+    /// Gets the root directory of the current file system.
+    /// </summary>
+    IDirectory RootDirectory { get; }
 }
