@@ -86,5 +86,7 @@ public class VersionStep(
                 throw new Exception("When incrementing a version number, all remaining version parts must be 0.");
             }
         }
+
+        logger.LogInformation("Version {Version} is valid and can be used for package {PackageName}.", projectInfo.Version, projectInfo.Name);
     }
 }
