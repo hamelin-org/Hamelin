@@ -4,17 +4,13 @@ internal class PhysicalFileSystem(string path) : IFileSystem
 {
     public IDirectory CurrentDirectory { get; } = new PhysicalDirectory(path);
 
-    public IFile GetFile(string path)
-    {
-        return Path.IsPathRooted(path)
-            ? new PhysicalFile(path)
-            : throw new ArgumentException("Path must be absolute.");
-    }
+    public IDirectory RootDirectory { get; } = ResolveRoot(path);
 
-    public IDirectory GetDirectory(string path)
+    private static PhysicalDirectory ResolveRoot(string path)
     {
-        return Path.IsPathRooted(path)
-            ? new PhysicalDirectory(path)
-            : throw new ArgumentException("Path must be absolute.");
+        string absolutePath = Path.GetFullPath(path);
+        string root = Path.GetPathRoot(absolutePath)
+                      ?? throw new ArgumentException("Path must have a root.", nameof(path));
+        return new PhysicalDirectory(root);
     }
 }
