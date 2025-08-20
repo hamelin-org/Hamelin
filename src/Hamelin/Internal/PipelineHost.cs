@@ -25,17 +25,8 @@ internal class PipelineHost(
     {
         try
         {
-            int result = await RunPipeline(cancellationToken);
-            Environment.ExitCode = result;
-        }
-        catch (Exception)
-        {
-            // The only way we reach this is when the pipeline terminates early due to an unhandled error.
-            if (options.Value.EnableAutomaticExitCodes)
-            {
-                Environment.ExitCode = PipelineExitCodes.StoppedOnError;
-            }
-            throw;
+            var summary = await RunPipeline(cancellationToken);
+            Environment.ExitCode = summary.ExitCode;
         }
         finally
         {
@@ -47,56 +38,63 @@ internal class PipelineHost(
         }
     }
 
-    private async Task<int> RunPipeline(CancellationToken cancellationToken)
+    private async Task<PipelineExecutionSummary> RunPipeline(CancellationToken cancellationToken)
     {
         // Resolve the steps from a scoped service provider.
         await using var scope = scopeFactory.CreateAsyncScope();
         var context = scope.ServiceProvider.GetRequiredService<IPipelineContext>();
+
+        var results = await RunSteps(scope, cancellationToken);
+        var summary = new PipelineExecutionSummary(options, context, results, cancellationToken);
+        return summary;
+    }
+
+    private async Task<IEnumerable<PipelineStepResult>> RunSteps(AsyncServiceScope scope, CancellationToken cancellationToken)
+    {
+        List<PipelineStepResult> results = [];
         var stepProvider = scope.ServiceProvider.GetRequiredService<IPipelineStepProvider>();
         var steps = stepProvider.GetSteps();
-        var loggerFactory = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
-
-        int automaticExitCode = PipelineExitCodes.Success;
         foreach (var step in steps)
         {
-            if (cancellationToken.IsCancellationRequested)
+            var result = await RunStep(step, cancellationToken);
+            results.Add(result);
+            if (!result.Continue)
             {
-                logger.LogInformation("Pipeline execution cancelled. Stopping execution of remaining steps.");
-                automaticExitCode = PipelineExitCodes.StoppedAfterCancel;
                 break;
             }
-
-            var stepType = step.GetType();
-            string stepName = stepType.Name;
-            var stepLogger = loggerFactory.CreateLogger(stepType);
-
-            try
-            {
-                stepLogger.LogInformation("Running {StepName}", stepName);
-                await step.Run(cancellationToken);
-                stepLogger.LogInformation("{StepName} completed successfully.", stepName);
-            }
-            catch (Exception ex)
-            {
-                switch (options.Value.TerminationMode)
-                {
-                    case PipelineTerminationMode.StopAfterAllSteps:
-                        stepLogger.LogError(ex, "Unhandled error during pipeline execution of step {StepName}. Continuing...", stepName);
-                        automaticExitCode = PipelineExitCodes.ContinuedAfterError;
-                        break;
-                    case PipelineTerminationMode.StopOnUnhandledException: // This is the default behaviour, so fall through to default case
-                    default:
-                        stepLogger.LogCritical(ex, "Unhandled error during pipeline execution of step {StepName}. Exiting.", stepName);
-                        lifetime.StopApplication();
-                        throw;
-                }
-            }
         }
 
-        if (options.Value.EnableAutomaticExitCodes && automaticExitCode != PipelineExitCodes.Success)
+        return results.ToArray();
+    }
+
+    private async Task<PipelineStepResult> RunStep(IPipelineStep step, CancellationToken cancellationToken)
+    {
+        var stepType = step.GetType();
+        string stepName = stepType.Name;
+
+        if (cancellationToken.IsCancellationRequested)
         {
-            return automaticExitCode;
+            return PipelineStepResult.StoppedAfterCancel;
         }
-        return context.ExitCode ?? PipelineExitCodes.Success;
+
+        try
+        {
+            await step.Run(cancellationToken);
+            return PipelineStepResult.Successful;
+        }
+        catch (Exception ex)
+        {
+            switch (options.Value.TerminationMode)
+            {
+                case PipelineTerminationMode.StopAfterAllSteps:
+                    logger.LogError(ex, "Unhandled error during pipeline execution of step {StepName}. Continuing...", stepName);
+                    return PipelineStepResult.ContinuedAfterError(ex);
+                case PipelineTerminationMode.StopOnUnhandledException: // This is the default behaviour, so fall through to default case
+                default:
+                    logger.LogCritical(ex, "Unhandled error during pipeline execution of step {StepName}. Exiting.", stepName);
+                    lifetime.StopApplication();
+                    return PipelineStepResult.StoppedOnError(ex);
+            }
+        }
     }
 }
