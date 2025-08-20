@@ -176,10 +176,9 @@ public class PipelineHostTests
         );
 
         // Act
-        var act = () => host.StartAsync(CancellationToken.None);
+        await host.StartAsync(CancellationToken.None);
 
         // Assert
-        await act.ShouldNotThrowAsync();
         Environment.ExitCode.ShouldBe(PipelineExitCodes.ContinuedAfterError);
     }
 
