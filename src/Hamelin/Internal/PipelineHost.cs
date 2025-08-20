@@ -54,31 +54,39 @@ internal class PipelineHost(
         var context = scope.ServiceProvider.GetRequiredService<IPipelineContext>();
         var stepProvider = scope.ServiceProvider.GetRequiredService<IPipelineStepProvider>();
         var steps = stepProvider.GetSteps();
+        var loggerFactory = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
 
         int automaticExitCode = PipelineExitCodes.Success;
         foreach (var step in steps)
         {
             if (cancellationToken.IsCancellationRequested)
             {
+                logger.LogInformation("Pipeline execution cancelled. Stopping execution of remaining steps.");
                 automaticExitCode = PipelineExitCodes.StoppedAfterCancel;
                 break;
             }
 
+            var stepType = step.GetType();
+            string stepName = stepType.Name;
+            var stepLogger = loggerFactory.CreateLogger(stepType);
+
             try
             {
+                stepLogger.LogInformation("Running {StepName}", stepName);
                 await step.Run(cancellationToken);
+                stepLogger.LogInformation("{StepName} completed successfully.", stepName);
             }
             catch (Exception ex)
             {
                 switch (options.Value.TerminationMode)
                 {
                     case PipelineTerminationMode.StopAfterAllSteps:
-                        logger.LogError(ex, "Unhandled error during pipeline execution. Continuing...");
+                        stepLogger.LogError(ex, "Unhandled error during pipeline execution of step {StepName}. Continuing...", stepName);
                         automaticExitCode = PipelineExitCodes.ContinuedAfterError;
                         break;
                     case PipelineTerminationMode.StopOnUnhandledException: // This is the default behaviour, so fall through to default case
                     default:
-                        logger.LogCritical(ex, "Unhandled error during pipeline execution. Exiting.");
+                        stepLogger.LogCritical(ex, "Unhandled error during pipeline execution of step {StepName}. Exiting.", stepName);
                         lifetime.StopApplication();
                         throw;
                 }
