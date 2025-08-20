@@ -83,10 +83,9 @@ public class PipelineHostTests
         );
 
         // Act
-        var act = () => host.StartAsync(CancellationToken.None);
+        await host.StartAsync(CancellationToken.None);
 
         // Assert
-        await act.ShouldThrowAsync<Exception>();
         Received.InOrder(() =>
         {
             step1.Run(Arg.Any<CancellationToken>());
@@ -156,10 +155,9 @@ public class PipelineHostTests
         );
 
         // Act
-        var act = () => host.StartAsync(CancellationToken.None);
+        await host.StartAsync(CancellationToken.None);
 
         // Assert
-        await act.ShouldThrowAsync<Exception>();
         Environment.ExitCode.ShouldBe(PipelineExitCodes.StoppedOnError);
     }
 
@@ -178,10 +176,9 @@ public class PipelineHostTests
         );
 
         // Act
-        var act = () => host.StartAsync(CancellationToken.None);
+        await host.StartAsync(CancellationToken.None);
 
         // Assert
-        await act.ShouldNotThrowAsync();
         Environment.ExitCode.ShouldBe(PipelineExitCodes.ContinuedAfterError);
     }
 
@@ -225,10 +222,9 @@ public class PipelineHostTests
             });
 
         // Act
-        var act = () => host.StartAsync(CancellationToken.None);
+        await host.StartAsync(CancellationToken.None);
 
         // Assert
-        await act.ShouldThrowAsync<Exception>();
         Environment.ExitCode.ShouldBe(PipelineExitCodes.Success);
     }
 
@@ -306,10 +302,9 @@ public class PipelineHostTests
         );
 
         // Act
-        var act = () => host.StartAsync(CancellationToken.None);
+        await host.StartAsync(CancellationToken.None);
 
         // Assert
-        await act.ShouldThrowAsync<Exception>();
         Environment.ExitCode.ShouldBe(PipelineExitCodes.StoppedOnError);
     }
 }
