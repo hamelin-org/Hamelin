@@ -1,3 +1,4 @@
+using Hamelin.Hooks;
 using Hamelin.Steps;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -44,9 +45,40 @@ internal class PipelineHost(
         await using var scope = scopeFactory.CreateAsyncScope();
         var context = scope.ServiceProvider.GetRequiredService<IPipelineContext>();
 
+        await RunPrePipelineHooks(scope, cancellationToken);
         var results = await RunSteps(scope, cancellationToken);
         var summary = new PipelineExecutionSummary(options, context, results, cancellationToken);
+        await RunPrePipelineHooks(scope, summary, cancellationToken);
+
         return summary;
+    }
+
+    private async Task RunPrePipelineHooks(AsyncServiceScope scope, CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        var hooks = scope.ServiceProvider.GetServices<IPrePipelineHook>();
+        foreach (var hook in hooks)
+        {
+            await hook.PrePipeline(cancellationToken);
+        }
+    }
+
+    private async Task RunPrePipelineHooks(AsyncServiceScope scope, PipelineExecutionSummary summary, CancellationToken cancellationToken)
+    {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        var hooks = scope.ServiceProvider.GetServices<IPostPipelineHook>();
+        foreach (var hook in hooks)
+        {
+            await hook.PostPipeline(summary, cancellationToken);
+        }
     }
 
     private async Task<IEnumerable<PipelineStepResult>> RunSteps(AsyncServiceScope scope, CancellationToken cancellationToken)
