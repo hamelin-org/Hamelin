@@ -1,3 +1,4 @@
+using Hamelin.Hooks;
 using Hamelin.Tests.Unit.Helpers;
 using Microsoft.Extensions.Hosting;
 
@@ -190,7 +191,7 @@ public class PipelineHostTests
 
         var host = PipelineHostHelpers.CreateHost(
             steps: [step1],
-            options => options.EnableAutomaticExitCodes = false
+            configure: options => options.EnableAutomaticExitCodes = false
         );
 
         var cts = new CancellationTokenSource();
@@ -306,5 +307,59 @@ public class PipelineHostTests
 
         // Assert
         Environment.ExitCode.ShouldBe(PipelineExitCodes.StoppedOnError);
+    }
+
+    [Fact]
+    public async Task StartAsync_WithPrePipelineHooks_RunsHooks()
+    {
+        // Arrange
+        var hook1 = Substitute.For<IPrePipelineHook>();
+        var hook2 = Substitute.For<IPrePipelineHook>();
+        var step = PipelineStepHelpers.CreateMock();
+
+        var host = PipelineHostHelpers.CreateHost(
+            prePipelineHooks: [hook1, hook2],
+            steps: [step],
+            configure: options => options.TerminationMode = PipelineTerminationMode.StopAfterAllSteps
+        );
+
+        // Act
+        var act = () => host.StartAsync(CancellationToken.None);
+
+        // Assert
+        await act.ShouldNotThrowAsync();
+        Received.InOrder(() =>
+        {
+            hook1.PrePipeline(Arg.Any<CancellationToken>());
+            hook2.PrePipeline(Arg.Any<CancellationToken>());
+            step.Run(Arg.Any<CancellationToken>());
+        });
+    }
+
+    [Fact]
+    public async Task StartAsync_WithPostPipelineHooks_RunsHooks()
+    {
+        // Arrange
+        var hook1 = Substitute.For<IPostPipelineHook>();
+        var hook2 = Substitute.For<IPostPipelineHook>();
+        var step = PipelineStepHelpers.CreateMock();
+
+        var host = PipelineHostHelpers.CreateHost(
+            steps: [step],
+            postPipelineHooks: [hook1, hook2],
+            configure: options => options.TerminationMode = PipelineTerminationMode.StopAfterAllSteps
+        );
+
+        // Act
+        var act = () => host.StartAsync(CancellationToken.None);
+
+        // Assert
+        await act.ShouldNotThrowAsync();
+        Received.InOrder(() =>
+        {
+            step.Run(Arg.Any<CancellationToken>());
+            hook1.PostPipeline(Arg.Any<PipelineExecutionSummary>(), Arg.Any<CancellationToken>());
+            hook2.PostPipeline(Arg.Any<PipelineExecutionSummary>(), Arg.Any<CancellationToken>());
+        });
     }
 }
