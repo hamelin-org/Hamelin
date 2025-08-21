@@ -84,4 +84,19 @@ public class PhysicalFileTests
         // Assert
         content.Trim().ShouldBe("This file does exist.");
     }
+
+    [Fact]
+    public void Delete_ExistingFile_ShouldAllowRead()
+    {
+        // Arrange
+        string path = Path.GetTempFileName();
+        var file = new PhysicalFile(path);
+        file.Exists.ShouldBe(true);
+
+        // Act
+        file.Delete();
+
+        // Assert
+        file.Exists.ShouldBe(false);
+    }
 }
