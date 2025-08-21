@@ -53,30 +53,30 @@ internal class PipelineHost(
         return summary;
     }
 
-    private static async Task RunPrePipelineHooks(AsyncServiceScope scope, CancellationToken cancellationToken)
+    private async Task RunPrePipelineHooks(AsyncServiceScope scope, CancellationToken cancellationToken)
     {
-        if (cancellationToken.IsCancellationRequested)
-        {
-            return;
-        }
-
         var hooks = scope.ServiceProvider.GetServices<IPrePipelineHook>();
         foreach (var hook in hooks)
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                logger.LogInformation("Aborting pre-pipeline hooks due to cancellation request.");
+                return;
+            }
             await hook.PrePipeline(cancellationToken);
         }
     }
 
-    private static async Task RunPostPipelineHooks(AsyncServiceScope scope, PipelineExecutionSummary summary, CancellationToken cancellationToken)
+    private async Task RunPostPipelineHooks(AsyncServiceScope scope, PipelineExecutionSummary summary, CancellationToken cancellationToken)
     {
-        if (cancellationToken.IsCancellationRequested)
-        {
-            return;
-        }
-
         var hooks = scope.ServiceProvider.GetServices<IPostPipelineHook>();
         foreach (var hook in hooks)
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                logger.LogInformation("Aborting post-pipeline hooks due to cancellation request.");
+                return;
+            }
             await hook.PostPipeline(summary, cancellationToken);
         }
     }
@@ -106,6 +106,7 @@ internal class PipelineHost(
 
         if (cancellationToken.IsCancellationRequested)
         {
+            logger.LogInformation("Aborting pipeline steps due to cancellation request.");
             return PipelineStepResult.StoppedAfterCancel;
         }
 
