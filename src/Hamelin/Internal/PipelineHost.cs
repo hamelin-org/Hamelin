@@ -48,7 +48,7 @@ internal class PipelineHost(
         await RunPrePipelineHooks(scope, cancellationToken);
         var results = await RunSteps(scope, cancellationToken);
         var summary = new PipelineExecutionSummary(options, context, results, cancellationToken);
-        await RunPrePipelineHooks(scope, summary, cancellationToken);
+        await RunPostPipelineHooks(scope, summary, cancellationToken);
 
         return summary;
     }
@@ -67,7 +67,7 @@ internal class PipelineHost(
         }
     }
 
-    private async Task RunPrePipelineHooks(AsyncServiceScope scope, PipelineExecutionSummary summary, CancellationToken cancellationToken)
+    private async Task RunPostPipelineHooks(AsyncServiceScope scope, PipelineExecutionSummary summary, CancellationToken cancellationToken)
     {
         if (cancellationToken.IsCancellationRequested)
         {
