@@ -53,7 +53,7 @@ internal class PipelineHost(
         return summary;
     }
 
-    private async Task RunPrePipelineHooks(AsyncServiceScope scope, CancellationToken cancellationToken)
+    private static async Task RunPrePipelineHooks(AsyncServiceScope scope, CancellationToken cancellationToken)
     {
         if (cancellationToken.IsCancellationRequested)
         {
@@ -67,7 +67,7 @@ internal class PipelineHost(
         }
     }
 
-    private async Task RunPostPipelineHooks(AsyncServiceScope scope, PipelineExecutionSummary summary, CancellationToken cancellationToken)
+    private static async Task RunPostPipelineHooks(AsyncServiceScope scope, PipelineExecutionSummary summary, CancellationToken cancellationToken)
     {
         if (cancellationToken.IsCancellationRequested)
         {
