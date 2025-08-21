@@ -358,8 +358,8 @@ public class PipelineHostTests
         Received.InOrder(() =>
         {
             step.Run(Arg.Any<CancellationToken>());
-            hook1.PostPipeline(Arg.Any<PipelineExecutionSummary>(),Arg.Any<CancellationToken>());
-            hook2.PostPipeline(Arg.Any<PipelineExecutionSummary>(),Arg.Any<CancellationToken>());
+            hook1.PostPipeline(Arg.Any<PipelineExecutionSummary>(), Arg.Any<CancellationToken>());
+            hook2.PostPipeline(Arg.Any<PipelineExecutionSummary>(), Arg.Any<CancellationToken>());
         });
     }
 }
