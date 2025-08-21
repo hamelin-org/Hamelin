@@ -168,3 +168,6 @@ Sometimes there are actions you want to run before and after a pipeline that don
 
 For these cases, there are a set of hooks that are run automatically at the start and end of every pipeline. They can be added to by registering instances of `IPrePipelineHook` and `IPostPipelineHook` with the `IServiceCollection`.
 
+Hooks are run serially in the order they are registered with the service provider, and any unhandled exceptions will cause the pipeline to terminate.
+
+Post-pipeline hooks will be run regardless of any errors that occur during the pipeline steps.
