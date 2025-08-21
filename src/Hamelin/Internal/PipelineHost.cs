@@ -135,7 +135,7 @@ internal class PipelineHost(
 
         try
         {
-            logger.LogInformation("Running {StepName}.", stepName);
+            logger.LogInformation("Running {StepName}...", stepName);
             await step.Run(cancellationToken);
             logger.LogInformation("{StepName} completed successfully.", stepName);
             return PipelineStepResult.Successful;
