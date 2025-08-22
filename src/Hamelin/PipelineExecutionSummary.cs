@@ -14,7 +14,7 @@ public class PipelineExecutionSummary
     public PipelineExecutionSummary(
         IOptions<PipelineExecutionOptions> options,
         IPipelineContext context,
-        IEnumerable<PipelineStepResult> steps,
+        IEnumerable<StepExecutionSummary> steps,
         CancellationToken cancellationToken
     )
     {
@@ -31,12 +31,12 @@ public class PipelineExecutionSummary
     /// <summary>
     /// Gets the results of each step in the pipeline execution.
     /// </summary>
-    public IReadOnlyCollection<PipelineStepResult> Steps { get; init; }
+    public IReadOnlyCollection<StepExecutionSummary> Steps { get; init; }
 
-    private static int CalculateExitCode(IOptions<PipelineExecutionOptions> options, IPipelineContext context, ReadOnlyCollection<PipelineStepResult> steps, CancellationToken cancellationToken)
+    private static int CalculateExitCode(IOptions<PipelineExecutionOptions> options, IPipelineContext context, ReadOnlyCollection<StepExecutionSummary> steps, CancellationToken cancellationToken)
     {
-        int autoCode = steps.LastOrDefault()?.ExitCode ?? PipelineExitCodes.Success;
-        if (autoCode == PipelineExitCodes.Success && steps.Any(r => r.ExitCode == PipelineExitCodes.ContinuedAfterError))
+        int autoCode = steps.LastOrDefault()?.Result.ExitCode ?? PipelineExitCodes.Success;
+        if (autoCode == PipelineExitCodes.Success && steps.Any(r => r.Result.ExitCode == PipelineExitCodes.ContinuedAfterError))
         {
             autoCode = PipelineExitCodes.ContinuedAfterError;
         }
