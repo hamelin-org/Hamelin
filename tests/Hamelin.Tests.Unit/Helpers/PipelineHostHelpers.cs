@@ -1,7 +1,4 @@
-using Hamelin.Hooks;
 using Hamelin.Internal;
-using Hamelin.Steps;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -11,41 +8,34 @@ namespace Hamelin.Tests.Unit.Helpers;
 internal static class PipelineHostHelpers
 {
     public static PipelineHost CreateHost(
-        IPipelineStep[]? steps = null,
-        IPrePipelineHook[]? prePipelineHooks = null,
-        IPostPipelineHook[]? postPipelineHooks = null,
+        IPipelineRunner? runner = null,
         Action<PipelineExecutionOptions>? configure = null,
-        IPipelineContext? context = null,
         IHostApplicationLifetime? lifetime = null,
         ILogger<PipelineHost>? logger = null
     )
     {
         logger ??= Substitute.For<ILogger<PipelineHost>>();
-        context ??= Substitute.For<IPipelineContext>();
         lifetime ??= Substitute.For<IHostApplicationLifetime>();
-
-        var stepProvider = Substitute.For<IPipelineStepProvider>();
-        stepProvider.GetSteps().Returns(steps ?? []);
-
-        var services = new ServiceCollection()
-            .AddSingleton(stepProvider)
-            .AddSingleton(context);
-
-        foreach (var hook in prePipelineHooks ?? [])
-        {
-            services.AddScoped<IPrePipelineHook>(_ => hook);
-        }
-        foreach (var hook in postPipelineHooks ?? [])
-        {
-            services.AddScoped<IPostPipelineHook>(_ => hook);
-        }
-
-        var provider = services.BuildServiceProvider();
-        var scopeFactory = ServiceScopeHelpers.CreateScopeFactory(provider);
 
         PipelineExecutionOptions pipelineExecutionOptions = new();
         configure?.Invoke(pipelineExecutionOptions);
 
-        return new PipelineHost(logger, lifetime, scopeFactory, Options.Create(pipelineExecutionOptions));
+        var options = Options.Create(pipelineExecutionOptions);
+
+        if (runner == null)
+        {
+            runner = Substitute.For<IPipelineRunner>();
+
+            var context = Substitute.For<IPipelineContext>();
+            context.ExitCode.Returns(0);
+
+            var summary = new PipelineExecutionSummary(options, context, [], CancellationToken.None);
+
+            runner
+                .RunPipeline(Arg.Any<CancellationToken>())
+                .Returns(summary);
+        }
+
+        return new PipelineHost(logger, options, lifetime, runner);
     }
 }

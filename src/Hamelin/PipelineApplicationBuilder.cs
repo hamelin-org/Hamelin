@@ -91,8 +91,10 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
         Action<TContainerBuilder>? configure = null
     ) where TContainerBuilder : notnull => _innerBuilder.ConfigureContainer(factory, configure);
 
-    private void ApplyServices(IServiceCollection services)
+    private static void ApplyServices(IServiceCollection services)
     {
+        services.TryAddSingleton<IPipelineRunner, DefaultPipelineRunner>();
+        services.TryAddSingleton<IPipelineStepRunner, DefaultPipelineStepRunner>();
         services.TryAddScoped<IFileSystem>(_ => new PhysicalFileSystem(System.Environment.CurrentDirectory));
         services.TryAddScoped<IPipelineState, DefaultPipelineState>();
         services.TryAddScoped<IPipelineContext, DefaultPipelineContext>();
