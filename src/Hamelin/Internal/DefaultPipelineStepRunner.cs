@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -7,8 +6,7 @@ namespace Hamelin.Internal;
 
 internal class DefaultPipelineStepRunner(
     ILogger<DefaultPipelineStepRunner> logger,
-    IOptions<PipelineExecutionOptions> options,
-    IHostApplicationLifetime lifetime
+    IOptions<PipelineExecutionOptions> options
 ) : IPipelineStepRunner
 {
     public async Task<PipelineStepResult> RunStep(AsyncServiceScope scope, IPipelineStep step, CancellationToken cancellationToken)
@@ -42,7 +40,6 @@ internal class DefaultPipelineStepRunner(
                 case PipelineTerminationMode.StopOnUnhandledException:
                 default:
                     logger.LogCritical(ex, "Unhandled error during step. Exiting.");
-                    lifetime.StopApplication();
                     return PipelineStepResult.StoppedOnError(ex);
             }
         }
