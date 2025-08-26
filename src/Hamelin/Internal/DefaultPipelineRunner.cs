@@ -31,7 +31,7 @@ internal class DefaultPipelineRunner(
         return summary;
     }
 
-      private async Task RunPrePipelineHooks(AsyncServiceScope scope, CancellationToken cancellationToken)
+    private async Task RunPrePipelineHooks(AsyncServiceScope scope, CancellationToken cancellationToken)
     {
         var hooks = scope.ServiceProvider.GetServices<IPrePipelineHook>().ToList();
         if (hooks.Count == 0)
