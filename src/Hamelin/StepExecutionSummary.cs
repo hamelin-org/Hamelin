@@ -15,6 +15,12 @@ public class StepExecutionSummary
     /// </summary>
     public required PipelineStepResult Result { get; init; }
 
+    /// <summary>
+    /// Creates an execution summary for the given step.
+    /// </summary>
+    /// <param name="step">The step to create the summary for.</param>
+    /// <param name="result">The result of the execution.</param>
+    /// <returns>The created summary.</returns>
     public static StepExecutionSummary FromStep(IPipelineStep step, PipelineStepResult result)
     {
         string stepName = step.GetType().Name;
