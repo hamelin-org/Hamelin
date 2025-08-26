@@ -27,7 +27,7 @@ internal static class DefaultPipelineRunnerHelpers
             stepRunner = Substitute.For<IPipelineStepRunner>();
             stepRunner
                 .RunStep(Arg.Any<AsyncServiceScope>(), Arg.Any<IPipelineStep>(), Arg.Any<CancellationToken>())
-                .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.Successful });
+                .Returns(PipelineStepResult.Successful);
         }
 
         var stepProvider = Substitute.For<IPipelineStepProvider>();

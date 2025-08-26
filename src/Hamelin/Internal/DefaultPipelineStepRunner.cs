@@ -11,18 +11,17 @@ internal class DefaultPipelineStepRunner(
     IHostApplicationLifetime lifetime
 ) : IPipelineStepRunner
 {
-    public async Task<StepExecutionSummary> RunStep(AsyncServiceScope scope, IPipelineStep step, CancellationToken cancellationToken)
+    public async Task<PipelineStepResult> RunStep(AsyncServiceScope scope, IPipelineStep step, CancellationToken cancellationToken)
     {
         if (cancellationToken.IsCancellationRequested)
         {
             logger.LogInformation("Aborting pipeline step due to cancellation request.");
-            return StepExecutionSummary.FromStep(step, PipelineStepResult.StoppedAfterCancel);
+            return PipelineStepResult.StoppedAfterCancel;
         }
 
         var result = await RunStepCore(step, cancellationToken);
-        var summary = StepExecutionSummary.FromStep(step, result);
 
-        return summary;
+        return result;
     }
 
     private async Task<PipelineStepResult> RunStepCore(IPipelineStep step, CancellationToken cancellationToken)

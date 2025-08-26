@@ -82,22 +82,22 @@ internal class DefaultPipelineRunner(
         }
     }
 
-    private async Task<IEnumerable<StepExecutionSummary>> RunSteps(AsyncServiceScope scope, CancellationToken cancellationToken)
+    private async Task<IEnumerable<PipelineStepResult>> RunSteps(AsyncServiceScope scope, CancellationToken cancellationToken)
     {
-        List<StepExecutionSummary> summaries = [];
+        List<PipelineStepResult> summaries = [];
         var stepProvider = scope.ServiceProvider.GetRequiredService<IPipelineStepProvider>();
         var steps = stepProvider.GetSteps();
         foreach (var step in steps)
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                summaries.Add(StepExecutionSummary.FromStep(step, PipelineStepResult.StoppedAfterCancel));
+                summaries.Add(PipelineStepResult.StoppedAfterCancel);
                 break;
             }
 
-            var summary = await stepRunner.RunStep(scope, step, cancellationToken);
-            summaries.Add(summary);
-            if (!summary.Result.Continue)
+            var result = await stepRunner.RunStep(scope, step, cancellationToken);
+            summaries.Add(result);
+            if (!result.Continue)
             {
                 logger.LogInformation("Step resulted in non-continuation. Aborting pipeline.");
                 break;
