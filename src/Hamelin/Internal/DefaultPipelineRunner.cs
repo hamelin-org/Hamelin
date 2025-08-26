@@ -13,7 +13,6 @@ internal class DefaultPipelineRunner(
     IPipelineStepRunner stepRunner
 ) : IPipelineRunner
 {
-
     public async Task<PipelineExecutionSummary> RunPipeline(CancellationToken cancellationToken)
     {
         logger.LogInformation("Running pipeline...");
@@ -37,49 +36,46 @@ internal class DefaultPipelineRunner(
         if (hooks.Count == 0)
         {
             logger.LogInformation("No pre-pipeline hooks registered.");
+            return;
         }
-        else
-        {
-            logger.LogInformation("Running pre-pipeline hooks...");
-            foreach (var hook in hooks)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    logger.LogInformation("Aborting pre-pipeline hooks due to cancellation request.");
-                    return;
-                }
 
-                await hook.PrePipeline(cancellationToken);
+        logger.LogInformation("Running pre-pipeline hooks...");
+        foreach (var hook in hooks)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                logger.LogInformation("Aborting pre-pipeline hooks due to cancellation request.");
+                return;
             }
 
-            logger.LogInformation("Pre-pipeline hooks completed successfully.");
+            await hook.PrePipeline(cancellationToken);
         }
+
+        logger.LogInformation("Pre-pipeline hooks completed successfully.");
     }
 
-    private async Task RunPostPipelineHooks(AsyncServiceScope scope, PipelineExecutionSummary summary,
-        CancellationToken cancellationToken)
+    private async Task RunPostPipelineHooks(AsyncServiceScope scope, PipelineExecutionSummary summary, CancellationToken cancellationToken)
     {
         var hooks = scope.ServiceProvider.GetServices<IPostPipelineHook>().ToList();
         if (hooks.Count == 0)
         {
             logger.LogInformation("No post-pipeline hooks registered.");
+            return;
         }
-        else
-        {
-            logger.LogInformation("Running post-pipeline hooks...");
-            foreach (var hook in hooks)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    logger.LogInformation("Aborting post-pipeline hooks due to cancellation request.");
-                    return;
-                }
 
-                await hook.PostPipeline(summary, cancellationToken);
+        logger.LogInformation("Running post-pipeline hooks...");
+        foreach (var hook in hooks)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                logger.LogInformation("Aborting post-pipeline hooks due to cancellation request.");
+                return;
             }
 
-            logger.LogInformation("Post-pipeline hooks completed successfully.");
+            await hook.PostPipeline(summary, cancellationToken);
         }
+
+        logger.LogInformation("Post-pipeline hooks completed successfully.");
     }
 
     private async Task<IEnumerable<PipelineStepResult>> RunSteps(AsyncServiceScope scope, CancellationToken cancellationToken)
