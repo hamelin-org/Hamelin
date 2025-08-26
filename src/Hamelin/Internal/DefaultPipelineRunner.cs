@@ -82,14 +82,19 @@ internal class DefaultPipelineRunner(
         }
     }
 
-    private async Task<IEnumerable<StepExecutionSummary>> RunSteps(AsyncServiceScope scope,
-        CancellationToken cancellationToken)
+    private async Task<IEnumerable<StepExecutionSummary>> RunSteps(AsyncServiceScope scope, CancellationToken cancellationToken)
     {
         List<StepExecutionSummary> summaries = [];
         var stepProvider = scope.ServiceProvider.GetRequiredService<IPipelineStepProvider>();
         var steps = stepProvider.GetSteps();
         foreach (var step in steps)
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                summaries.Add(StepExecutionSummary.FromStep(step, PipelineStepResult.StoppedAfterCancel));
+                break;
+            }
+
             var summary = await stepRunner.RunStep(scope, step, cancellationToken);
             summaries.Add(summary);
             if (!summary.Result.Continue)

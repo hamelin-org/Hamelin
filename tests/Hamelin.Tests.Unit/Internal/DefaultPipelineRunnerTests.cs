@@ -1,15 +1,12 @@
 using Hamelin.Hooks;
+using Hamelin.Internal;
 using Hamelin.Tests.Unit.Helpers;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Hamelin.Tests.Unit.Internal;
 
 public class DefaultPipelineRunnerTests
 {
-    public DefaultPipelineRunnerTests()
-    {
-        Environment.ExitCode = 0;
-    }
-
     [Fact]
     public async Task RunPipeline_WithSteps_RunsStepsInOrder()
     {
@@ -17,8 +14,12 @@ public class DefaultPipelineRunnerTests
         var step1 = PipelineStepHelpers.CreateMock();
         var step2 = PipelineStepHelpers.CreateMock();
         var step3 = PipelineStepHelpers.CreateMock();
+        var stepRunner = PipelineStepRunnerHelpers.CreateMock();
 
-        var sut = DefaultPipelineRunnerHelpers.CreateRunner([step1, step2, step3]);
+        var sut = DefaultPipelineRunnerHelpers.CreateRunner(
+            steps: [step1, step2, step3],
+            stepRunner: stepRunner
+        );
 
         // Act
         await sut.RunPipeline(CancellationToken.None);
@@ -26,23 +27,28 @@ public class DefaultPipelineRunnerTests
         // Assert
         Received.InOrder(() =>
         {
-            step1.Run(Arg.Any<CancellationToken>());
-            step2.Run(Arg.Any<CancellationToken>());
-            step3.Run(Arg.Any<CancellationToken>());
+            stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step1, Arg.Any<CancellationToken>());
+            stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>());
+            stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step3, Arg.Any<CancellationToken>());
         });
     }
 
     [Fact]
-    public async Task RunPipeline_WithStopOnUnhandledException_StopsOnUnhandledException()
+    public async Task RunPipeline_StoppedOnError_StopsOnUnhandledException()
     {
         // Arrange
         var step1 = PipelineStepHelpers.CreateMock();
         var step2 = PipelineStepHelpers.CreateMock();
-        step2.Run(Arg.Any<CancellationToken>()).ThrowsAsync(new Exception("Test"));
         var step3 = PipelineStepHelpers.CreateMock();
+
+        var stepRunner = PipelineStepRunnerHelpers.CreateMock();
+        stepRunner
+            .RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>())
+            .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.StoppedOnError(new Exception()) });
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1, step2, step3],
+            stepRunner: stepRunner,
             configure: options => options.TerminationMode = PipelineTerminationMode.StopOnUnhandledException
         );
 
@@ -52,23 +58,28 @@ public class DefaultPipelineRunnerTests
         // Assert
         Received.InOrder(() =>
         {
-            step1.Run(Arg.Any<CancellationToken>());
-            step2.Run(Arg.Any<CancellationToken>());
+            stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step1, Arg.Any<CancellationToken>());
+            stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>());
         });
-        await step3.DidNotReceive().Run(Arg.Any<CancellationToken>());
+        await stepRunner.DidNotReceive().RunStep(Arg.Any<AsyncServiceScope>(), step3, Arg.Any<CancellationToken>());
     }
 
     [Fact]
-    public async Task RunPipeline_WithStopAfterAllSteps_StopsAfterAllSteps()
+    public async Task RunPipeline_ContinuedAfterError_StopsAfterAllSteps()
     {
         // Arrange
         var step1 = PipelineStepHelpers.CreateMock();
         var step2 = PipelineStepHelpers.CreateMock();
-        step2.Run(Arg.Any<CancellationToken>()).ThrowsAsync(new Exception("Test"));
         var step3 = PipelineStepHelpers.CreateMock();
+
+        var stepRunner = PipelineStepRunnerHelpers.CreateMock();
+        stepRunner
+            .RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>())
+            .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.ContinuedAfterError(new Exception()) });
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1, step2, step3],
+            stepRunner: stepRunner,
             configure: options => options.TerminationMode = PipelineTerminationMode.StopAfterAllSteps
         );
 
@@ -79,14 +90,14 @@ public class DefaultPipelineRunnerTests
         await act.ShouldNotThrowAsync();
         Received.InOrder(() =>
         {
-            step1.Run(Arg.Any<CancellationToken>());
-            step2.Run(Arg.Any<CancellationToken>());
-            step3.Run(Arg.Any<CancellationToken>());
+            stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step1, Arg.Any<CancellationToken>());
+            stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>());
+            stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step3, Arg.Any<CancellationToken>());
         });
     }
 
     [Fact]
-    public async Task RunPipeline_AutoExitCodesAndTokenCancelled_SetsExitCodeToCancelled()
+    public async Task RunPipeline_TokenCancelled_ReturnsCorrectExitCode()
     {
         // Arrange
         var step1 = PipelineStepHelpers.CreateMock();
@@ -97,53 +108,63 @@ public class DefaultPipelineRunnerTests
         await cts.CancelAsync();
 
         // Act
-        await sut.RunPipeline(cts.Token);
+        var summary = await sut.RunPipeline(cts.Token);
 
         // Assert
         await step1.DidNotReceive().Run(Arg.Any<CancellationToken>());
-        Environment.ExitCode.ShouldBe(PipelineExitCodes.StoppedAfterCancel);
+        summary.ExitCode.ShouldBe(PipelineExitCodes.StoppedAfterCancel);
     }
 
     [Fact]
-    public async Task RunPipeline_AutoExitCodesAndStopOnUnhandledException_SetsExitCodeToStoppedOnError()
+    public async Task RunPipeline_StopOnUnhandledException_ReturnsCorrectExitCode()
     {
         // Arrange
         var step1 = PipelineStepHelpers.CreateMock();
         var step2 = PipelineStepHelpers.CreateMock();
-        step2.Run(Arg.Any<CancellationToken>()).ThrowsAsync(new Exception("Test"));
         var step3 = PipelineStepHelpers.CreateMock();
+
+        var stepRunner = PipelineStepRunnerHelpers.CreateMock();
+        stepRunner
+            .RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>())
+            .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.StoppedOnError(new Exception()) });
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1, step2, step3],
+            stepRunner: stepRunner,
             configure: options => options.TerminationMode = PipelineTerminationMode.StopOnUnhandledException
         );
 
         // Act
-        await sut.RunPipeline(CancellationToken.None);
+        var summary = await sut.RunPipeline(CancellationToken.None);
 
         // Assert
-        Environment.ExitCode.ShouldBe(PipelineExitCodes.StoppedOnError);
+        summary.ExitCode.ShouldBe(PipelineExitCodes.StoppedOnError);
     }
 
     [Fact]
-    public async Task RunPipeline_AutoExitCodesAndStopAfterAllSteps_SetsExitCodeToContinuedAfterError()
+    public async Task RunPipeline_ContinueOnError_ReturnsCorrectExitCode()
     {
         // Arrange
         var step1 = PipelineStepHelpers.CreateMock();
         var step2 = PipelineStepHelpers.CreateMock();
-        step2.Run(Arg.Any<CancellationToken>()).ThrowsAsync(new Exception("Test"));
         var step3 = PipelineStepHelpers.CreateMock();
+
+        var stepRunner = PipelineStepRunnerHelpers.CreateMock();
+        stepRunner
+            .RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>())
+            .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.ContinuedAfterError(new Exception()) });
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1, step2, step3],
+            stepRunner: stepRunner,
             configure: options => options.TerminationMode = PipelineTerminationMode.StopAfterAllSteps
         );
 
         // Act
-        await sut.RunPipeline(CancellationToken.None);
+        var summary = await sut.RunPipeline(CancellationToken.None);
 
         // Assert
-        Environment.ExitCode.ShouldBe(PipelineExitCodes.ContinuedAfterError);
+        summary.ExitCode.ShouldBe(PipelineExitCodes.ContinuedAfterError);
     }
 
     [Fact]
@@ -151,9 +172,11 @@ public class DefaultPipelineRunnerTests
     {
         // Arrange
         var step1 = PipelineStepHelpers.CreateMock();
+        var stepRunner = PipelineStepRunnerHelpers.CreateMock();
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1],
+            stepRunner: stepRunner,
             configure: options => options.EnableAutomaticExitCodes = false
         );
 
@@ -161,11 +184,11 @@ public class DefaultPipelineRunnerTests
         await cts.CancelAsync();
 
         // Act
-        await sut.RunPipeline(cts.Token);
+        var summary = await sut.RunPipeline(cts.Token);
 
         // Assert
         await step1.DidNotReceive().Run(Arg.Any<CancellationToken>());
-        Environment.ExitCode.ShouldBe(PipelineExitCodes.Success);
+        summary.ExitCode.ShouldBe(PipelineExitCodes.Success);
     }
 
     [Fact]
@@ -174,11 +197,16 @@ public class DefaultPipelineRunnerTests
         // Arrange
         var step1 = PipelineStepHelpers.CreateMock();
         var step2 = PipelineStepHelpers.CreateMock();
-        step2.Run(Arg.Any<CancellationToken>()).ThrowsAsync(new Exception("Test"));
         var step3 = PipelineStepHelpers.CreateMock();
+
+        var stepRunner = PipelineStepRunnerHelpers.CreateMock();
+        stepRunner
+            .RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>())
+            .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.StoppedOnError(new Exception()) });
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1, step2, step3],
+            stepRunner: stepRunner,
             configure: options =>
             {
                 options.EnableAutomaticExitCodes = false;
@@ -186,10 +214,10 @@ public class DefaultPipelineRunnerTests
             });
 
         // Act
-        await sut.RunPipeline(CancellationToken.None);
+        var summary = await sut.RunPipeline(CancellationToken.None);
 
         // Assert
-        Environment.ExitCode.ShouldBe(PipelineExitCodes.Success);
+        summary.ExitCode.ShouldBe(PipelineExitCodes.Success);
     }
 
     [Fact]
@@ -198,11 +226,16 @@ public class DefaultPipelineRunnerTests
         // Arrange
         var step1 = PipelineStepHelpers.CreateMock();
         var step2 = PipelineStepHelpers.CreateMock();
-        step2.Run(Arg.Any<CancellationToken>()).ThrowsAsync(new Exception("Test"));
         var step3 = PipelineStepHelpers.CreateMock();
+
+        var stepRunner = PipelineStepRunnerHelpers.CreateMock();
+        stepRunner
+            .RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>())
+            .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.ContinuedAfterError(new Exception()) });
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1, step2, step3],
+            stepRunner: stepRunner,
             configure: options =>
             {
                 options.EnableAutomaticExitCodes = false;
@@ -210,11 +243,10 @@ public class DefaultPipelineRunnerTests
             });
 
         // Act
-        var act = () => sut.RunPipeline(CancellationToken.None);
+        var summary = await sut.RunPipeline(CancellationToken.None);
 
         // Assert
-        await act.ShouldNotThrowAsync();
-        Environment.ExitCode.ShouldBe(PipelineExitCodes.Success);
+        summary.ExitCode.ShouldBe(PipelineExitCodes.Success);
     }
 
     [Fact]
@@ -222,26 +254,24 @@ public class DefaultPipelineRunnerTests
     {
         // Arrange
         var context = Substitute.For<IPipelineContext>();
-
         var step1 = PipelineStepHelpers.CreateMock();
-        step1
-            .When(s => s.Run(Arg.Any<CancellationToken>()))
-            .Do((i) =>
-            {
-                context.ExitCode = 1234;
-            });
+
+        var stepRunner = PipelineStepRunnerHelpers.CreateMock();
+        stepRunner
+            .When(s => s.RunStep(Arg.Any<AsyncServiceScope>(), step1, Arg.Any<CancellationToken>()))
+            .Do(_ => context.ExitCode = 1234);
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1],
+            stepRunner: stepRunner,
             context: context
         );
 
         // Act
-        var act = () => sut.RunPipeline(CancellationToken.None);
+        var summary = await sut.RunPipeline(CancellationToken.None);
 
         // Assert
-        await act.ShouldNotThrowAsync();
-        Environment.ExitCode.ShouldBe(1234);
+        summary.ExitCode.ShouldBe(1234);
     }
 
     [Fact]
@@ -251,25 +281,28 @@ public class DefaultPipelineRunnerTests
         var context = Substitute.For<IPipelineContext>();
 
         var step1 = PipelineStepHelpers.CreateMock();
-        step1
-            .When(s => s.Run(Arg.Any<CancellationToken>()))
-            .Do((i) =>
-            {
-                context.ExitCode = 1234;
-            });
         var step2 = PipelineStepHelpers.CreateMock();
-        step2.Run(Arg.Any<CancellationToken>()).ThrowsAsync(new Exception("Test"));
+        var stepRunner = PipelineStepRunnerHelpers.CreateMock();
+
+        stepRunner
+            .When(s => s.RunStep(Arg.Any<AsyncServiceScope>(), step1, Arg.Any<CancellationToken>()))
+            .Do(_ => context.ExitCode = 1234);
+
+        stepRunner
+            .RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>())
+            .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.StoppedOnError(new Exception()) });
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1, step2],
+            stepRunner: stepRunner,
             context: context
         );
 
         // Act
-        await sut.RunPipeline(CancellationToken.None);
+        var summary = await sut.RunPipeline(CancellationToken.None);
 
         // Assert
-        Environment.ExitCode.ShouldBe(PipelineExitCodes.StoppedOnError);
+        summary.ExitCode.ShouldBe(PipelineExitCodes.StoppedOnError);
     }
 
     [Fact]
@@ -279,10 +312,12 @@ public class DefaultPipelineRunnerTests
         var hook1 = Substitute.For<IPrePipelineHook>();
         var hook2 = Substitute.For<IPrePipelineHook>();
         var step = PipelineStepHelpers.CreateMock();
+        var stepRunner = PipelineStepRunnerHelpers.CreateMock();
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             prePipelineHooks: [hook1, hook2],
             steps: [step],
+            stepRunner: stepRunner,
             configure: options => options.TerminationMode = PipelineTerminationMode.StopAfterAllSteps
         );
 
@@ -295,7 +330,7 @@ public class DefaultPipelineRunnerTests
         {
             hook1.PrePipeline(Arg.Any<CancellationToken>());
             hook2.PrePipeline(Arg.Any<CancellationToken>());
-            step.Run(Arg.Any<CancellationToken>());
+            stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step, Arg.Any<CancellationToken>());
         });
     }
 
@@ -306,10 +341,12 @@ public class DefaultPipelineRunnerTests
         var hook1 = Substitute.For<IPostPipelineHook>();
         var hook2 = Substitute.For<IPostPipelineHook>();
         var step = PipelineStepHelpers.CreateMock();
+        var stepRunner = PipelineStepRunnerHelpers.CreateMock();
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step],
             postPipelineHooks: [hook1, hook2],
+            stepRunner: stepRunner,
             configure: options => options.TerminationMode = PipelineTerminationMode.StopAfterAllSteps
         );
 
@@ -320,7 +357,7 @@ public class DefaultPipelineRunnerTests
         await act.ShouldNotThrowAsync();
         Received.InOrder(() =>
         {
-            step.Run(Arg.Any<CancellationToken>());
+            stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step, Arg.Any<CancellationToken>());
             hook1.PostPipeline(Arg.Any<PipelineExecutionSummary>(), Arg.Any<CancellationToken>());
             hook2.PostPipeline(Arg.Any<PipelineExecutionSummary>(), Arg.Any<CancellationToken>());
         });

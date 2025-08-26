@@ -1,6 +1,7 @@
-using Hamelin.Hooks;
+using Hamelin.Internal;
 using Hamelin.Tests.Unit.Helpers;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace Hamelin.Tests.Unit.Internal;
 
@@ -9,6 +10,32 @@ public class PipelineHostTests
     public PipelineHostTests()
     {
         Environment.ExitCode = 0;
+    }
+
+    [Fact]
+    public async Task StartAsync_RunsPipelineAndSetsExitCode()
+    {
+        // Arrange
+        var context = Substitute.For<IPipelineContext>();
+        context.ExitCode.Returns(1234);
+
+        PipelineExecutionOptions pipelineExecutionOptions = new();
+        var options = Options.Create(pipelineExecutionOptions);
+        var summary = new PipelineExecutionSummary(options, context, [], CancellationToken.None);
+
+        var runner = Substitute.For<IPipelineRunner>();
+        runner
+            .RunPipeline(Arg.Any<CancellationToken>())
+            .Returns(summary);
+
+        var sut = PipelineHostHelpers.CreateHost(runner);
+
+        // Act
+        await sut.StartAsync(CancellationToken.None);
+
+        // Assert
+        await runner.Received().RunPipeline(Arg.Any<CancellationToken>());
+        Environment.ExitCode.ShouldBe(1234);
     }
 
     [Fact]
@@ -46,6 +73,4 @@ public class PipelineHostTests
         // Assert
         lifetime.DidNotReceive().StopApplication();
     }
-
-    // TODO: Test for running pipeline.
 }

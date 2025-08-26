@@ -21,7 +21,14 @@ internal static class DefaultPipelineRunnerHelpers
     {
         logger ??= Substitute.For<ILogger<DefaultPipelineRunner>>();
         context ??= Substitute.For<IPipelineContext>();
-        stepRunner ??= Substitute.For<IPipelineStepRunner>();
+
+        if (stepRunner == null)
+        {
+            stepRunner = Substitute.For<IPipelineStepRunner>();
+            stepRunner
+                .RunStep(Arg.Any<AsyncServiceScope>(), Arg.Any<IPipelineStep>(), Arg.Any<CancellationToken>())
+                .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.Successful });
+        }
 
         var stepProvider = Substitute.For<IPipelineStepProvider>();
         stepProvider.GetSteps().Returns(steps ?? []);

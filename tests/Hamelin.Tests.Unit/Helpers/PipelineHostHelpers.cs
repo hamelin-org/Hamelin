@@ -16,11 +16,26 @@ internal static class PipelineHostHelpers
     {
         logger ??= Substitute.For<ILogger<PipelineHost>>();
         lifetime ??= Substitute.For<IHostApplicationLifetime>();
-        runner ??= Substitute.For<IPipelineRunner>();
 
         PipelineExecutionOptions pipelineExecutionOptions = new();
         configure?.Invoke(pipelineExecutionOptions);
 
-        return new PipelineHost(logger, Options.Create(pipelineExecutionOptions), lifetime, runner);
+        var options = Options.Create(pipelineExecutionOptions);
+
+        if (runner == null)
+        {
+            runner = Substitute.For<IPipelineRunner>();
+
+            var context = Substitute.For<IPipelineContext>();
+            context.ExitCode.Returns(0);
+
+            var summary = new PipelineExecutionSummary(options, context, [], CancellationToken.None);
+
+            runner
+                .RunPipeline(Arg.Any<CancellationToken>())
+                .Returns(summary);
+        }
+
+        return new PipelineHost(logger, options, lifetime, runner);
     }
 }
