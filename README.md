@@ -164,10 +164,22 @@ Each pipeline execution is run inside its own dependency scope, similar to a web
 
 ### Hooks
 
+#### Pipeline Hooks
+
 Sometimes there are actions you want to run before and after a pipeline that don't quite work as a step. An example of this is publishing a summary at the end of a pipeline, regardless of whether the pipeline succeeded or not.
 
 For these cases, there are a set of hooks that are run automatically at the start and end of every pipeline. They can be added to by registering instances of `IPrePipelineHook` and `IPostPipelineHook` with the `IServiceCollection`.
 
-Hooks are run serially in the order they are registered with the service provider, and any unhandled exceptions will cause the pipeline to terminate.
+Hooks are run serially in the order they are registered with the service provider. Any unhandled exceptions will be logged, but won't cause the pipeline to terminate.
 
 Post-pipeline hooks will be run regardless of any errors that occur during the pipeline steps.
+
+#### Step Hooks
+
+In some niche use cases, it can also be useful to run hooks before and after each step. Step hooks work the same as pipeline hooks, needing to be registered with the `IServiceCollection` using the `IPreStepHook` and `IPostStepHook` interfaces.
+
+Step hooks are run serially in the order they are registered with the service provider. Any unhandled exceptions will be logged, but won't cause the pipeline to terminate.
+
+Post-step hooks will be run regardless of any errors that occur during the pipeline step.
+
+One example use case for this is when integrating to a build system, and being able to group the log output for each step.
