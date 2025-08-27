@@ -362,4 +362,66 @@ public class DefaultPipelineRunnerTests
             hook2.PostPipeline(Arg.Any<PipelineExecutionSummary>(), Arg.Any<CancellationToken>());
         });
     }
+
+    [Fact]
+    public async Task RunPipeline_PrePipelineHookError_StillRunsAllHooks()
+    {
+        // Arrange
+        var hook1 = Substitute.For<IPrePipelineHook>();
+        hook1.PrePipeline(Arg.Any<CancellationToken>()).ThrowsAsync<Exception>();
+
+        var hook2 = Substitute.For<IPrePipelineHook>();
+        var step = PipelineStepHelpers.CreateMock();
+        var stepRunner = PipelineStepRunnerHelpers.CreateMock();
+
+        var sut = DefaultPipelineRunnerHelpers.CreateRunner(
+            prePipelineHooks: [hook1, hook2],
+            steps: [step],
+            stepRunner: stepRunner,
+            configure: options => options.TerminationMode = PipelineTerminationMode.StopAfterAllSteps
+        );
+
+        // Act
+        var act = () => sut.RunPipeline(CancellationToken.None);
+
+        // Assert
+        await act.ShouldNotThrowAsync();
+        Received.InOrder(() =>
+        {
+            hook1.PrePipeline(Arg.Any<CancellationToken>());
+            hook2.PrePipeline(Arg.Any<CancellationToken>());
+            stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step, Arg.Any<CancellationToken>());
+        });
+    }
+
+    [Fact]
+    public async Task RunPipeline_PostPipelineHookError_StillRunsAllHooks()
+    {
+        // Arrange
+        var hook1 = Substitute.For<IPostPipelineHook>();
+        hook1.PostPipeline(Arg.Any<PipelineExecutionSummary>(),Arg.Any<CancellationToken>()).ThrowsAsync<Exception>();
+
+        var hook2 = Substitute.For<IPostPipelineHook>();
+        var step = PipelineStepHelpers.CreateMock();
+        var stepRunner = PipelineStepRunnerHelpers.CreateMock();
+
+        var sut = DefaultPipelineRunnerHelpers.CreateRunner(
+            steps: [step],
+            postPipelineHooks: [hook1, hook2],
+            stepRunner: stepRunner,
+            configure: options => options.TerminationMode = PipelineTerminationMode.StopAfterAllSteps
+        );
+
+        // Act
+        var act = () => sut.RunPipeline(CancellationToken.None);
+
+        // Assert
+        await act.ShouldNotThrowAsync();
+        Received.InOrder(() =>
+        {
+            stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step, Arg.Any<CancellationToken>());
+            hook1.PostPipeline(Arg.Any<PipelineExecutionSummary>(), Arg.Any<CancellationToken>());
+            hook2.PostPipeline(Arg.Any<PipelineExecutionSummary>(), Arg.Any<CancellationToken>());
+        });
+    }
 }
