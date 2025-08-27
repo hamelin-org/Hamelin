@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Title>Hamelin</Title>
+    <Description>An unopinionated library for creating CI/CD pipelines in .NET.</Description>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Title>Hamelin</Title>
     <Copyright>2025</Copyright>
     <PackageId>Hamelin</PackageId>
     <PackageProjectUrl>https://github.com/hamelin-org/Hamelin</PackageProjectUrl>
@@ -19,6 +20,7 @@
     <FileVersion>$(Version)</FileVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageTags>devops;cicd;build;automation;pipelines</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
