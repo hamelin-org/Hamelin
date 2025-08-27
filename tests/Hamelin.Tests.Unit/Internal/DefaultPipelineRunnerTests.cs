@@ -44,7 +44,7 @@ public class DefaultPipelineRunnerTests
         var stepRunner = PipelineStepRunnerHelpers.CreateMock();
         stepRunner
             .RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>())
-            .Returns(PipelineStepResult.StoppedOnError(new Exception()));
+            .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.StoppedOnError(new Exception()) });
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1, step2, step3],
@@ -75,7 +75,7 @@ public class DefaultPipelineRunnerTests
         var stepRunner = PipelineStepRunnerHelpers.CreateMock();
         stepRunner
             .RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>())
-            .Returns(PipelineStepResult.ContinuedAfterError(new Exception()));
+            .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.ContinuedAfterError(new Exception()) });
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1, step2, step3],
@@ -126,7 +126,7 @@ public class DefaultPipelineRunnerTests
         var stepRunner = PipelineStepRunnerHelpers.CreateMock();
         stepRunner
             .RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>())
-            .Returns(PipelineStepResult.StoppedOnError(new Exception()));
+            .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.StoppedOnError(new Exception()) });;
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1, step2, step3],
@@ -152,7 +152,7 @@ public class DefaultPipelineRunnerTests
         var stepRunner = PipelineStepRunnerHelpers.CreateMock();
         stepRunner
             .RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>())
-            .Returns(PipelineStepResult.ContinuedAfterError(new Exception()));
+            .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.ContinuedAfterError(new Exception()) });;
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1, step2, step3],
@@ -202,7 +202,7 @@ public class DefaultPipelineRunnerTests
         var stepRunner = PipelineStepRunnerHelpers.CreateMock();
         stepRunner
             .RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>())
-            .Returns(PipelineStepResult.StoppedOnError(new Exception()));
+            .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.StoppedOnError(new Exception()) });;
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1, step2, step3],
@@ -231,7 +231,7 @@ public class DefaultPipelineRunnerTests
         var stepRunner = PipelineStepRunnerHelpers.CreateMock();
         stepRunner
             .RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>())
-            .Returns(PipelineStepResult.ContinuedAfterError(new Exception()));
+            .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.ContinuedAfterError(new Exception()) });;
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1, step2, step3],
@@ -290,7 +290,7 @@ public class DefaultPipelineRunnerTests
 
         stepRunner
             .RunStep(Arg.Any<AsyncServiceScope>(), step2, Arg.Any<CancellationToken>())
-            .Returns(PipelineStepResult.StoppedOnError(new Exception()));
+            .Returns(new StepExecutionSummary { StepName = "", Result = PipelineStepResult.StoppedOnError(new Exception()) });;
 
         var sut = DefaultPipelineRunnerHelpers.CreateRunner(
             steps: [step1, step2],
