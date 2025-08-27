@@ -14,4 +14,14 @@ public class StepExecutionSummary
     /// The result of executing the step.
     /// </summary>
     public required PipelineStepResult Result { get; init; }
+
+    public static StepExecutionSummary FromStep(IPipelineStep step, PipelineStepResult result)
+    {
+        string stepName = step.GetType().Name;
+        return new StepExecutionSummary
+        {
+            StepName = stepName,
+            Result = result
+        };
+    }
 }
