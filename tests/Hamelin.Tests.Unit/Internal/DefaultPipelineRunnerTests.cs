@@ -399,7 +399,7 @@ public class DefaultPipelineRunnerTests
     {
         // Arrange
         var hook1 = Substitute.For<IPostPipelineHook>();
-        hook1.PostPipeline(Arg.Any<PipelineExecutionSummary>(),Arg.Any<CancellationToken>()).ThrowsAsync<Exception>();
+        hook1.PostPipeline(Arg.Any<PipelineExecutionSummary>(), Arg.Any<CancellationToken>()).ThrowsAsync<Exception>();
 
         var hook2 = Substitute.For<IPostPipelineHook>();
         var step = PipelineStepHelpers.CreateMock();
