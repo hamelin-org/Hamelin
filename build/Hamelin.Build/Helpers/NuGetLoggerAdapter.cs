@@ -16,7 +16,7 @@ public class NuGetLoggerAdapter(ILogger logger) : NuGet.Common.ILogger
     public void LogError(string data) => logger.LogWarning(data);
     public void LogInformationSummary(string data) => logger.LogInformation(data);
 
-    public void Log(LogLevel level, string data) =>  logger.Log(level switch
+    public void Log(LogLevel level, string data) => logger.Log(level switch
     {
         LogLevel.Debug => Microsoft.Extensions.Logging.LogLevel.Debug,
         LogLevel.Verbose => Microsoft.Extensions.Logging.LogLevel.Trace,
