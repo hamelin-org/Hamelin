@@ -1,4 +1,5 @@
 using Hamelin.Hooks;
+using Hamelin.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -12,6 +13,9 @@ internal class DefaultPipelineStepRunner(
 {
     public async Task<StepExecutionSummary> RunStep(AsyncServiceScope scope, IPipelineStep step, CancellationToken cancellationToken)
     {
+        var attribs = new LogAttributes { StepName = step.GetType().Name };
+        using var loggingScope = logger.BeginScope(attribs);
+
         if (cancellationToken.IsCancellationRequested)
         {
             logger.LogInformation("Aborting pipeline step due to cancellation request.");
