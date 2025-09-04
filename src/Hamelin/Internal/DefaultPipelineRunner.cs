@@ -101,7 +101,7 @@ internal class DefaultPipelineRunner(
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                summaries.Add(StepExecutionSummary.FromStep(step, PipelineStepResult.StoppedAfterCancel));
+                summaries.Add(new StepExecutionSummary(step.GetDisplayName(), PipelineStepResult.StoppedAfterCancel));
                 break;
             }
 

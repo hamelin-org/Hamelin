@@ -13,19 +13,21 @@ internal class DefaultPipelineStepRunner(
 {
     public async Task<StepExecutionSummary> RunStep(AsyncServiceScope scope, IPipelineStep step, CancellationToken cancellationToken)
     {
-        var attribs = new LogAttributes { StepName = step.GetType().Name };
+        string displayName = step.GetDisplayName();
+
+        var attribs = new LogAttributes { StepName = displayName };
         using var loggingScope = logger.BeginScope(attribs);
 
         if (cancellationToken.IsCancellationRequested)
         {
             logger.LogInformation("Aborting pipeline step due to cancellation request.");
-            return StepExecutionSummary.FromStep(step, PipelineStepResult.StoppedAfterCancel);
+            return new StepExecutionSummary(displayName, PipelineStepResult.StoppedAfterCancel);
         }
 
         await RunPreStepHooks(scope);
 
         var result = await RunStepCore(step, cancellationToken);
-        var summary = StepExecutionSummary.FromStep(step, result);
+        var summary = new StepExecutionSummary(displayName, result);
 
         await RunPostStepHooks(scope, summary);
 

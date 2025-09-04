@@ -8,8 +8,6 @@ using Microsoft.Extensions.Hosting;
 
 var builder = PipelineApplication.CreateBuilder(args);
 
-builder.Logging.AddPipelineConsoleFormatter();
-
 builder.Services
     .AddScoped<ICommandRunner, CliWrapCommandRunner>()
     .AddGitHubActionsRuntime()

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using Hamelin.Internal;
@@ -202,7 +203,7 @@ public class PipelineConsoleFormatterTests
     }
 
     [Fact]
-    public async Task Log_ForPipelineStep_ShouldIncludeStepName()
+    public async Task Log_ForPipelineStep_ShouldIncludeStepClassName()
     {
         // Arrange
         var formattingOptions = new PipelineConsoleFormatterOptions { ColorBehavior = LoggerColorBehavior.Disabled, IncludeScopes = true, IncludeStepNames = true };
@@ -222,7 +223,31 @@ public class PipelineConsoleFormatterTests
 
         // Assert
         string output = _writer.ToString();
-        output.ShouldContain($"TestStep: {TestStep.TestMessage}");
+        output.ShouldContain($"{nameof(TestStep)}: {TestStep.TestMessage}");
+    }
+
+    [Fact]
+    public async Task Log_ForPipelineStepWithDisplayNameAttribute_ShouldIncludeStepDisplayName()
+    {
+        // Arrange
+        var formattingOptions = new PipelineConsoleFormatterOptions { ColorBehavior = LoggerColorBehavior.Disabled, IncludeScopes = true, IncludeStepNames = true };
+        ReplaceLoggerAndProvider(formattingOptions);
+
+        var testStep = new TestStepWithName(CreateLogger<TestStep>());
+
+        var pipelineRunner = DefaultPipelineRunnerHelpers.CreateRunner(
+            steps: [testStep],
+            logger: CreateLogger<DefaultPipelineRunner>(),
+            stepRunner: DefaultPipelineStepRunnerHelpers.CreateRunner(logger: CreateLogger<DefaultPipelineStepRunner>())
+        );
+
+        // Act
+        _ = await pipelineRunner.RunPipeline(TestContext.Current.CancellationToken);
+        _provider.Dispose();
+
+        // Assert
+        string output = _writer.ToString();
+        output.ShouldContain($"{TestStepWithName.CustomName}: {TestStep.TestMessage}");
     }
 }
 
@@ -235,4 +260,10 @@ internal class TestStep(ILogger<TestStep> logger) : IPipelineStep
         logger.LogInformation(TestMessage);
         return Task.CompletedTask;
     }
+}
+
+[DisplayName(CustomName)]
+internal class TestStepWithName(ILogger<TestStep> logger) : TestStep(logger)
+{
+    public const string CustomName = "CustomName";
 }
