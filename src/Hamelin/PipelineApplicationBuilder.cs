@@ -52,6 +52,8 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
 
         _innerBuilder.Services
             .AddOptions<PipelineExecutionOptions>();
+
+        Logging.AddPipelineConsoleFormatter();
     }
 
     /// <inheritdoc />
@@ -93,6 +95,8 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
 
     private static void ApplyServices(IServiceCollection services)
     {
+        services.AddSingleton(TimeProvider.System);
+
         services.TryAddSingleton<IPipelineRunner, DefaultPipelineRunner>();
         services.TryAddSingleton<IPipelineStepRunner, DefaultPipelineStepRunner>();
         services.TryAddScoped<IFileSystem>(_ => new PhysicalFileSystem(System.Environment.CurrentDirectory));

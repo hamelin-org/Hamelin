@@ -35,7 +35,7 @@ internal class DefaultPipelineRunner(
         var hooks = scope.ServiceProvider.GetServices<IPrePipelineHook>().ToList();
         if (hooks.Count == 0)
         {
-            logger.LogInformation("No pre-pipeline hooks registered.");
+            logger.LogDebug("No pre-pipeline hooks registered.");
             return;
         }
 
@@ -66,7 +66,7 @@ internal class DefaultPipelineRunner(
         var hooks = scope.ServiceProvider.GetServices<IPostPipelineHook>().ToList();
         if (hooks.Count == 0)
         {
-            logger.LogInformation("No post-pipeline hooks registered.");
+            logger.LogDebug("No post-pipeline hooks registered.");
             return;
         }
 
@@ -101,7 +101,7 @@ internal class DefaultPipelineRunner(
         {
             if (cancellationToken.IsCancellationRequested)
             {
-                summaries.Add(StepExecutionSummary.FromStep(step, PipelineStepResult.StoppedAfterCancel));
+                summaries.Add(new StepExecutionSummary(step.GetDisplayName(), PipelineStepResult.StoppedAfterCancel));
                 break;
             }
 
