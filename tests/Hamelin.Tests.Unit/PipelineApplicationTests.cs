@@ -36,10 +36,28 @@ public class PipelineApplicationTests
         var pipeline = builder.Build();
 
         // Act
+        pipeline.UseStep(typeof(TestPipelineStep));
+
+        // Assert
+        collector.Received().AddStep(typeof(TestPipelineStep));
+    }
+
+    [Fact]
+    public void UseStepGeneric_AddsStepToCollector()
+    {
+        // Arrange
+        var collector = Substitute.For<IPipelineStepCollection>();
+
+        var builder = PipelineApplication.CreateBuilder();
+        builder.Services.AddSingleton(collector);
+
+        var pipeline = builder.Build();
+
+        // Act
         pipeline.UseStep<TestPipelineStep>();
 
         // Assert
-        collector.Received().AddStep<TestPipelineStep>();
+        collector.Received().AddStep(typeof(TestPipelineStep));
     }
 }
 
