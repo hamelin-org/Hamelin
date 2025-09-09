@@ -15,8 +15,8 @@ public class PipelineStepProviderTests
             .BuildServiceProvider();
 
         var collection = new PipelineStepCollection();
-        collection.AddStep<DummyStep1>();
-        collection.AddStep<DummyStep2>();
+        collection.AddStep(typeof(DummyStep1));
+        collection.AddStep(typeof(DummyStep2));
 
         var provider = new PipelineStepProvider(collection, services);
 

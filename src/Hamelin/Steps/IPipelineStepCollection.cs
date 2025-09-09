@@ -2,6 +2,6 @@ namespace Hamelin.Steps;
 
 internal interface IPipelineStepCollection
 {
-    void AddStep<TStep>() where TStep : IPipelineStep;
+    void AddStep(Type step);
     IReadOnlyCollection<Type> GetSteps();
 }

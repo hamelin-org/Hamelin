@@ -35,14 +35,22 @@ public class PipelineApplication : IHost
     /// </summary>
     /// <typeparam name="TStep">The type of the step to add. It must implement <see cref="IPipelineStep"/>.</typeparam>
     /// <returns>The current <see cref="PipelineApplication"/> instance.</returns>
-    public PipelineApplication UseStep<TStep>() where TStep : class, IPipelineStep
+    public PipelineApplication UseStep<TStep>() where TStep : class, IPipelineStep => UseStep(typeof(TStep));
+
+    /// <summary>
+    /// Registers a step with the pipeline that will be run when the application is executed.
+    /// Steps are resolved from the service provider and executed in the order they were added.
+    /// </summary>
+    /// <param name="step">The type of the step to add. It must implement <see cref="IPipelineStep"/>.</param>
+    /// <returns>The current <see cref="PipelineApplication"/> instance.</returns>
+    public PipelineApplication UseStep(Type step)
     {
         var collector = _host.Services.GetService<IPipelineStepCollection>();
         if (collector == null)
         {
             throw new InvalidOperationException("This method of step registration is not supported when a custom IPipelineStepProvider has been configured.");
         }
-        collector.AddStep<TStep>();
+        collector.AddStep(step);
         return this;
     }
 
