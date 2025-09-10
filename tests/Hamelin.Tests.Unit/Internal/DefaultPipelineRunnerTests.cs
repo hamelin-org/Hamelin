@@ -1,5 +1,4 @@
 using Hamelin.Hooks;
-using Hamelin.Internal;
 using Hamelin.Tests.Unit.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -328,8 +327,8 @@ public class DefaultPipelineRunnerTests
         await act.ShouldNotThrowAsync();
         Received.InOrder(() =>
         {
-            hook1.PrePipeline(Arg.Any<CancellationToken>());
-            hook2.PrePipeline(Arg.Any<CancellationToken>());
+            hook1.PrePipeline(Arg.Any<PrePipelineHookArgs>(), Arg.Any<CancellationToken>());
+            hook2.PrePipeline(Arg.Any<PrePipelineHookArgs>(), Arg.Any<CancellationToken>());
             stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step, Arg.Any<CancellationToken>());
         });
     }
@@ -358,8 +357,8 @@ public class DefaultPipelineRunnerTests
         Received.InOrder(() =>
         {
             stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step, Arg.Any<CancellationToken>());
-            hook1.PostPipeline(Arg.Any<PipelineExecutionSummary>(), Arg.Any<CancellationToken>());
-            hook2.PostPipeline(Arg.Any<PipelineExecutionSummary>(), Arg.Any<CancellationToken>());
+            hook1.PostPipeline(Arg.Any<PostPipelineHookArgs>(), Arg.Any<CancellationToken>());
+            hook2.PostPipeline(Arg.Any<PostPipelineHookArgs>(), Arg.Any<CancellationToken>());
         });
     }
 
@@ -368,7 +367,7 @@ public class DefaultPipelineRunnerTests
     {
         // Arrange
         var hook1 = Substitute.For<IPrePipelineHook>();
-        hook1.PrePipeline(Arg.Any<CancellationToken>()).ThrowsAsync<Exception>();
+        hook1.PrePipeline(Arg.Any<PrePipelineHookArgs>(), Arg.Any<CancellationToken>()).ThrowsAsync<Exception>();
 
         var hook2 = Substitute.For<IPrePipelineHook>();
         var step = PipelineStepHelpers.CreateMock();
@@ -388,8 +387,8 @@ public class DefaultPipelineRunnerTests
         await act.ShouldNotThrowAsync();
         Received.InOrder(() =>
         {
-            hook1.PrePipeline(Arg.Any<CancellationToken>());
-            hook2.PrePipeline(Arg.Any<CancellationToken>());
+            hook1.PrePipeline(Arg.Any<PrePipelineHookArgs>(), Arg.Any<CancellationToken>());
+            hook2.PrePipeline(Arg.Any<PrePipelineHookArgs>(), Arg.Any<CancellationToken>());
             stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step, Arg.Any<CancellationToken>());
         });
     }
@@ -399,7 +398,7 @@ public class DefaultPipelineRunnerTests
     {
         // Arrange
         var hook1 = Substitute.For<IPostPipelineHook>();
-        hook1.PostPipeline(Arg.Any<PipelineExecutionSummary>(), Arg.Any<CancellationToken>()).ThrowsAsync<Exception>();
+        hook1.PostPipeline(Arg.Any<PostPipelineHookArgs>(), Arg.Any<CancellationToken>()).ThrowsAsync<Exception>();
 
         var hook2 = Substitute.For<IPostPipelineHook>();
         var step = PipelineStepHelpers.CreateMock();
@@ -420,8 +419,8 @@ public class DefaultPipelineRunnerTests
         Received.InOrder(() =>
         {
             stepRunner.RunStep(Arg.Any<AsyncServiceScope>(), step, Arg.Any<CancellationToken>());
-            hook1.PostPipeline(Arg.Any<PipelineExecutionSummary>(), Arg.Any<CancellationToken>());
-            hook2.PostPipeline(Arg.Any<PipelineExecutionSummary>(), Arg.Any<CancellationToken>());
+            hook1.PostPipeline(Arg.Any<PostPipelineHookArgs>(), Arg.Any<CancellationToken>());
+            hook2.PostPipeline(Arg.Any<PostPipelineHookArgs>(), Arg.Any<CancellationToken>());
         });
     }
 }
