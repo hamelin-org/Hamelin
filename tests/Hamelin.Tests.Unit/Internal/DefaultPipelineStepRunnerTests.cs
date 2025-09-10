@@ -45,8 +45,8 @@ public class DefaultPipelineStepRunnerTests
         // Assert
         Received.InOrder(() =>
         {
-            hook1.PreStep(Arg.Any<CancellationToken>());
-            hook2.PreStep(Arg.Any<CancellationToken>());
+            hook1.PreStep(Arg.Any<PreStepHookArgs>(), Arg.Any<CancellationToken>());
+            hook2.PreStep(Arg.Any<PreStepHookArgs>(), Arg.Any<CancellationToken>());
             step.Run(Arg.Any<CancellationToken>());
         });
     }
@@ -57,7 +57,7 @@ public class DefaultPipelineStepRunnerTests
         // Arrange
         var hook1 = Substitute.For<IPreStepHook>();
         hook1
-            .PreStep(Arg.Any<CancellationToken>())
+            .PreStep(Arg.Any<PreStepHookArgs>(), Arg.Any<CancellationToken>())
             .ThrowsAsync<Exception>();
 
         var hook2 = Substitute.For<IPreStepHook>();
@@ -76,8 +76,8 @@ public class DefaultPipelineStepRunnerTests
         // Assert
         Received.InOrder(() =>
         {
-            hook1.PreStep(Arg.Any<CancellationToken>());
-            hook2.PreStep(Arg.Any<CancellationToken>());
+            hook1.PreStep(Arg.Any<PreStepHookArgs>(), Arg.Any<CancellationToken>());
+            hook2.PreStep(Arg.Any<PreStepHookArgs>(), Arg.Any<CancellationToken>());
             step.Run(Arg.Any<CancellationToken>());
         });
     }
@@ -104,8 +104,8 @@ public class DefaultPipelineStepRunnerTests
         Received.InOrder(() =>
         {
             step.Run(Arg.Any<CancellationToken>());
-            hook1.PostStep(Arg.Any<StepExecutionSummary>(), Arg.Any<CancellationToken>());
-            hook2.PostStep(Arg.Any<StepExecutionSummary>(), Arg.Any<CancellationToken>());
+            hook1.PostStep(Arg.Any<PostStepHookArgs>(), Arg.Any<CancellationToken>());
+            hook2.PostStep(Arg.Any<PostStepHookArgs>(), Arg.Any<CancellationToken>());
         });
     }
 
@@ -115,7 +115,7 @@ public class DefaultPipelineStepRunnerTests
         // Arrange
         var hook1 = Substitute.For<IPostStepHook>();
         hook1
-            .PostStep(Arg.Any<StepExecutionSummary>(), Arg.Any<CancellationToken>())
+            .PostStep(Arg.Any<PostStepHookArgs>(), Arg.Any<CancellationToken>())
             .ThrowsAsync<Exception>();
 
         var hook2 = Substitute.For<IPostStepHook>();
@@ -135,8 +135,8 @@ public class DefaultPipelineStepRunnerTests
         Received.InOrder(() =>
         {
             step.Run(Arg.Any<CancellationToken>());
-            hook1.PostStep(Arg.Any<StepExecutionSummary>(), Arg.Any<CancellationToken>());
-            hook2.PostStep(Arg.Any<StepExecutionSummary>(), Arg.Any<CancellationToken>());
+            hook1.PostStep(Arg.Any<PostStepHookArgs>(), Arg.Any<CancellationToken>());
+            hook2.PostStep(Arg.Any<PostStepHookArgs>(), Arg.Any<CancellationToken>());
         });
     }
 }
