@@ -24,7 +24,7 @@ internal class DefaultPipelineStepRunner(
             return new StepExecutionSummary(displayName, PipelineStepResult.StoppedAfterCancel);
         }
 
-        await RunPreStepHooks(scope);
+        await RunPreStepHooks(scope, attribs);
 
         var result = await RunStepCore(step, cancellationToken);
         var summary = new StepExecutionSummary(displayName, result);
@@ -34,7 +34,7 @@ internal class DefaultPipelineStepRunner(
         return summary;
     }
 
-    private async Task RunPreStepHooks(AsyncServiceScope scope)
+    private async Task RunPreStepHooks(AsyncServiceScope scope, LogAttributes attributes)
     {
         var hooks = scope.ServiceProvider.GetServices<IPreStepHook>().ToList();
         if (hooks.Count == 0)
@@ -43,20 +43,25 @@ internal class DefaultPipelineStepRunner(
             return;
         }
 
+        var args = new PreStepHookArgs
+        {
+            StepName = attributes.StepName,
+        };
+
         logger.LogDebug("Running pre-step hooks...");
         foreach (var hook in hooks)
         {
-            await RunPreStepHook(hook);
+            await RunPreStepHook(hook, args);
         }
 
         logger.LogDebug("Pre-step hooks complete.");
     }
 
-    private async Task RunPreStepHook(IPreStepHook hook)
+    private async Task RunPreStepHook(IPreStepHook hook, PreStepHookArgs args)
     {
         try
         {
-            await hook.PreStep(CancellationToken.None);
+            await hook.PreStep(args, CancellationToken.None);
         }
         catch (Exception ex)
         {
@@ -96,20 +101,26 @@ internal class DefaultPipelineStepRunner(
             return;
         }
 
+        var args = new PostStepHookArgs
+        {
+            StepName = summary.StepName,
+            Result = summary.Result
+        };
+
         logger.LogDebug("Running post-step hooks...");
         foreach (var hook in hooks)
         {
-            await RunPostStepHook(hook, summary);
+            await RunPostStepHook(hook, args);
         }
 
         logger.LogDebug("Post-step hooks complete.");
     }
 
-    private async Task RunPostStepHook(IPostStepHook hook, StepExecutionSummary summary)
+    private async Task RunPostStepHook(IPostStepHook hook, PostStepHookArgs args)
     {
         try
         {
-            await hook.PostStep(summary, CancellationToken.None);
+            await hook.PostStep(args, CancellationToken.None);
         }
         catch (Exception ex)
         {

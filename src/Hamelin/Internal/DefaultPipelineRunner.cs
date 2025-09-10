@@ -39,6 +39,8 @@ internal class DefaultPipelineRunner(
             return;
         }
 
+        var args = new PrePipelineHookArgs();
+
         logger.LogInformation("Running pre-pipeline hooks...");
         foreach (var hook in hooks)
         {
@@ -50,7 +52,7 @@ internal class DefaultPipelineRunner(
 
             try
             {
-                await hook.PrePipeline(cancellationToken);
+                await hook.PrePipeline(args, cancellationToken);
             }
             catch (Exception ex)
             {
@@ -70,6 +72,12 @@ internal class DefaultPipelineRunner(
             return;
         }
 
+        var args = new PostPipelineHookArgs
+        {
+            ExitCode = summary.ExitCode,
+            Steps = summary.Steps
+        };
+
         logger.LogInformation("Running post-pipeline hooks...");
         foreach (var hook in hooks)
         {
@@ -81,7 +89,7 @@ internal class DefaultPipelineRunner(
 
             try
             {
-                await hook.PostPipeline(summary, cancellationToken);
+                await hook.PostPipeline(args, cancellationToken);
             }
             catch (Exception ex)
             {
