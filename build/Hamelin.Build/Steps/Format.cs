@@ -1,15 +1,16 @@
+using System.ComponentModel;
 using Hamelin.Build.Services;
-using Microsoft.Extensions.Options;
 
 namespace Hamelin.Build.Steps;
 
-public class TestStep(IOptions<BuildOptions> options, ICommandRunner commands) : IPipelineStep
+[DisplayName("Validate Code Formatting")]
+public class Format(ICommandRunner commands) : IPipelineStep
 {
     public async Task Run(CancellationToken cancellationToken = default)
     {
         await commands.Run(
             command: "dotnet",
-            arguments: ["test", "--no-build", "--configuration", options.Value.Configuration],
+            arguments: ["format", "--verify-no-changes"],
             cancellationToken
         );
     }

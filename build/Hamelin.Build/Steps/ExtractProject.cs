@@ -1,11 +1,14 @@
+using System.ComponentModel;
 using System.Xml;
 using Hamelin.Build.Models;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NuGet.Versioning;
 
 namespace Hamelin.Build.Steps;
 
-public class ExtractProjectStep(IOptions<BuildOptions> options, IPipelineContext context) : IPipelineStep
+[DisplayName("Extract Project Information")]
+public class ExtractProject(ILogger<ExtractProject> logger, IOptions<BuildOptions> options, IPipelineContext context) : IPipelineStep
 {
     public async Task Run(CancellationToken cancellationToken = default)
     {
@@ -35,11 +38,14 @@ public class ExtractProjectStep(IOptions<BuildOptions> options, IPipelineContext
             throw new Exception("Unable to find Version in project file.");
         }
 
-        var projectInfo = new ProjectInfo()
+        var projectInfo = new ProjectInfo
         {
             Name = packageName,
             Version = NuGetVersion.Parse(packageVersion)
         };
+
+        logger.LogInformation("Extracted project info: {ProjectName} (v{Version})", projectInfo.Name, projectInfo.Version);
+
         context.State.Set(projectInfo);
     }
 }

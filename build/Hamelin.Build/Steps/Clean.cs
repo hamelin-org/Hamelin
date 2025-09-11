@@ -1,9 +1,11 @@
+using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Hamelin.Build.Steps;
 
-public class CleanStep(ILogger<CleanStep> logger, IOptions<BuildOptions> options, IPipelineContext context) : IPipelineStep
+[DisplayName("Clean Directories")]
+public class Clean(ILogger<Clean> logger, IOptions<BuildOptions> options, IPipelineContext context) : IPipelineStep
 {
     public Task Run(CancellationToken cancellationToken = default)
     {

@@ -5,6 +5,7 @@ using Hamelin.Build.Steps;
 using Hamelin.Runtimes.GitHubActions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Version = Hamelin.Build.Steps.Version;
 
 var builder = PipelineApplication.CreateBuilder(args);
 
@@ -28,21 +29,21 @@ switch (mode)
 {
     case "PullRequest":
         pipeline
-            .UseStep<CleanStep>()
-            .UseStep<FormatStep>()
-            .UseStep<ExtractProjectStep>()
-            .UseStep<VersionStep>()
-            .UseStep<RestoreStep>()
-            .UseStep<BuildStep>()
-            .UseStep<TestStep>();
+            .UseStep<Clean>()
+            .UseStep<Format>()
+            .UseStep<ExtractProject>()
+            .UseStep<Version>()
+            .UseStep<Restore>()
+            .UseStep<Build>()
+            .UseStep<Test>();
         break;
     case "Release":
         pipeline
-            .UseStep<CleanStep>()
-            .UseStep<RestoreStep>()
-            .UseStep<BuildStep>()
-            .UseStep<PackStep>()
-            .UseStep<PublishStep>();
+            .UseStep<Clean>()
+            .UseStep<Restore>()
+            .UseStep<Build>()
+            .UseStep<Pack>()
+            .UseStep<Publish>();
         break;
     default:
         throw new InvalidOperationException($"Unknown mode: {mode}");
