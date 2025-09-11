@@ -10,6 +10,14 @@ Add the Hamelin NuGet package to your project using the .NET CLI:
 dotnet add package Hamelin
 ```
 
+### Runtime Support
+
+Pipeline environments often have additional features that can't be supported by the core Hamelin package. To improve the developer experience, there are a set of runtime integration packages named in the format `Hamelin.Runtimes.[RuntimeName]`. These packages improve the log formatting to easily surface warnings and errors, as well as exposing certain commands like uploading build artifacts or outputting a job summary.
+
+Currently supported runtimes are:
+- [Hamelin.Runtimes.GitHubActions](https://github.com/hamelin-org/Hamelin.Runtimes.GitHubActions)
+- [Hamelin.Runtimes.AzurePipelines](https://github.com/hamelin-org/Hamelin.Runtimes.AzurePipelines)
+
 ## Usage
 
 Hamelin uses the [.NET Generic Host model](https://learn.microsoft.com/en-us/dotnet/core/extensions/generic-host) which means it should be familiar to anyone who has used ASP.NET. It is typically recommended for use in a console application, but other application types can also be used.
