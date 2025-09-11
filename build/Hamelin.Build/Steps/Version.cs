@@ -9,8 +9,8 @@ using NuGet.Versioning;
 
 namespace Hamelin.Build.Steps;
 
-public class VersionStep(
-    ILogger<VersionStep> logger,
+public class Version(
+    ILogger<Version> logger,
     IOptions<BuildOptions> options,
     IPipelineContext context
 ) : IPipelineStep

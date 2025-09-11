@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace Hamelin.Build.Steps;
 
-public class CleanStep(ILogger<CleanStep> logger, IOptions<BuildOptions> options, IPipelineContext context) : IPipelineStep
+public class Clean(ILogger<Clean> logger, IOptions<BuildOptions> options, IPipelineContext context) : IPipelineStep
 {
     public Task Run(CancellationToken cancellationToken = default)
     {

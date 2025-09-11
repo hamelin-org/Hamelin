@@ -5,7 +5,7 @@ using NuGet.Versioning;
 
 namespace Hamelin.Build.Steps;
 
-public class ExtractProjectStep(IOptions<BuildOptions> options, IPipelineContext context) : IPipelineStep
+public class ExtractProject(IOptions<BuildOptions> options, IPipelineContext context) : IPipelineStep
 {
     public async Task Run(CancellationToken cancellationToken = default)
     {

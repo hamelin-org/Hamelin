@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 
 namespace Hamelin.Build.Steps;
 
-public class PublishStep(IOptions<BuildOptions> options, IPipelineContext context, ICommandRunner commands) : IPipelineStep
+public class Publish(IOptions<BuildOptions> options, IPipelineContext context, ICommandRunner commands) : IPipelineStep
 {
     public async Task Run(CancellationToken cancellationToken = default)
     {
