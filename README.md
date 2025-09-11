@@ -32,7 +32,7 @@ Here’s a simple example of how to set up a pipeline, using some hypothetical s
 
 ```csharp
 using Hamelin;
-using Microsoft.Extensions.DependencyInjection;q
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = PipelineApplication.CreateBuilder(args);
