@@ -1,5 +1,7 @@
 # Hamelin
 
+[![Pull Request](https://github.com/hamelin-org/Hamelin/actions/workflows/pr.yml/badge.svg)](https://github.com/hamelin-org/Hamelin/actions/workflows/pr.yml) [![Release](https://github.com/hamelin-org/Hamelin/actions/workflows/release.yml/badge.svg)](https://github.com/hamelin-org/Hamelin/actions/workflows/release.yml)
+
 Hamelin is an unopinionated library for creating CI/CD pipelines in .NET. It uses the .NET hosting model to provide a familiar way to create testable build and deployment pipelines while also being able to leverage core features of the .NET ecosystem, like `IConfiguration`, `IServiceProvider` and `ILogger`.
 
 ## Installation
