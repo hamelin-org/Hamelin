@@ -1,8 +1,10 @@
+using System.ComponentModel;
 using Hamelin.Build.Services;
 using Microsoft.Extensions.Options;
 
 namespace Hamelin.Build.Steps;
 
+[DisplayName("Pack NuGet Package")]
 public class Pack(IOptions<BuildOptions> options, ICommandRunner commands) : IPipelineStep
 {
     public async Task Run(CancellationToken cancellationToken = default)

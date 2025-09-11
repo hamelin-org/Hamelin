@@ -1,8 +1,10 @@
+using System.ComponentModel;
 using Hamelin.Build.Services;
 using Microsoft.Extensions.Options;
 
 namespace Hamelin.Build.Steps;
 
+[DisplayName("Publish NuGet Package")]
 public class Publish(IOptions<BuildOptions> options, IPipelineContext context, ICommandRunner commands) : IPipelineStep
 {
     public async Task Run(CancellationToken cancellationToken = default)

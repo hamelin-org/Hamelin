@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Hamelin.Build.Helpers;
 using Hamelin.Build.Models;
 using Microsoft.Extensions.Logging;
@@ -9,6 +10,7 @@ using NuGet.Versioning;
 
 namespace Hamelin.Build.Steps;
 
+[DisplayName("Validate Package Version")]
 public class Version(
     ILogger<Version> logger,
     IOptions<BuildOptions> options,
