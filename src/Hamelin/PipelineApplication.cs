@@ -1,4 +1,5 @@
-﻿using Hamelin.Steps;
+﻿using Hamelin.Internal;
+using Hamelin.Steps;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -59,6 +60,38 @@ public class PipelineApplication : IHost
     {
         GC.SuppressFinalize(this);
         _host.Dispose();
+    }
+
+    /// <summary>
+    /// Runs the pipeline and returns the exit code from the execution.
+    /// </summary>
+    /// <returns>The exit code from the pipeline execution.</returns>
+    public int RunWithExitCode()
+    {
+        return RunWithExitCodeAsync().GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Runs the pipeline and returns the exit code from the execution.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>The exit code from the pipeline execution.</returns>
+    public async Task<int> RunWithExitCodeAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await StartAsync(cancellationToken).ConfigureAwait(false);
+            await this.WaitForShutdownAsync(cancellationToken).ConfigureAwait(false);
+
+            // Retrieve the exit code from the pipeline execution summary.
+            var store = Services.GetRequiredService<IPipelineExecutionSummaryStore>();
+            var summary = store.GetAndClearSummary();
+            return summary?.ExitCode ?? PipelineExitCodes.MissingSummary;
+        }
+        finally
+        {
+            Dispose();
+        }
     }
 
     /// <summary>

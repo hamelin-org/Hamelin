@@ -6,4 +6,5 @@ internal static class PipelineExitCodes
     public const int StoppedOnError = -1;
     public const int ContinuedAfterError = -2;
     public const int StoppedAfterCancel = -3;
+    public const int MissingSummary = -4;
 }

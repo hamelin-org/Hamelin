@@ -17,7 +17,6 @@ namespace Hamelin;
 public class PipelineApplicationBuilder : IHostApplicationBuilder
 {
     private readonly HostApplicationBuilder _innerBuilder;
-    private readonly PipelineApplicationOptions _options;
 
     /// <summary>
     /// Creates a new instance of the <see cref="PipelineApplicationBuilder"/> with the given options.
@@ -25,8 +24,6 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
     /// <param name="options">The options to configure the pipeline application.</param>
     internal PipelineApplicationBuilder(PipelineApplicationOptions options)
     {
-        _options = options;
-
         var configuration = new ConfigurationManager();
         configuration.AddInMemoryCollection(new Dictionary<string, string?>() {
             { "Logging:LogLevel:Microsoft.Hosting.Lifetime", nameof(LogLevel.Warning) }
@@ -99,6 +96,10 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
 
         services.TryAddSingleton<IPipelineRunner, DefaultPipelineRunner>();
         services.TryAddSingleton<IPipelineStepRunner, DefaultPipelineStepRunner>();
+        // Ideally this would be scoped, but it needs to be a singleton because
+        // the scope ends with the pipeline run, so it can't be fetched after.
+        services.TryAddSingleton<IPipelineExecutionSummaryStore, DefaultPipelineExecutionSummaryStore>();
+
         services.TryAddScoped<IFileSystem>(_ => new PhysicalFileSystem(System.Environment.CurrentDirectory));
         services.TryAddScoped<IPipelineState, DefaultPipelineState>();
         services.TryAddScoped<IPipelineContext, DefaultPipelineContext>();
