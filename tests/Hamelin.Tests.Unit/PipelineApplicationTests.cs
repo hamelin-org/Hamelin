@@ -25,6 +25,42 @@ public class PipelineApplicationTests
     }
 
     [Fact]
+    public async Task RunWithExitCodeAsync_EmptyApplication_DoesNotThrowOrHang()
+    {
+        // Arrange
+        var builder = PipelineApplication.CreateBuilder();
+        builder.Services.AddStep<TestPipelineStep>();
+
+        var pipeline = builder.Build();
+
+        pipeline.UseStep<TestPipelineStep>();
+
+        // Act
+        int exitCode = await pipeline.RunWithExitCodeAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        exitCode.ShouldBe(0);
+    }
+
+    [Fact]
+    public async Task RunWithExitCodeAsync_WithCustomExitCode_ReturnsExitCode()
+    {
+        // Arrange
+        var builder = PipelineApplication.CreateBuilder();
+        builder.Services.AddStep<SetExitCodeTestPipelineStep>();
+
+        var pipeline = builder.Build();
+
+        pipeline.UseStep<SetExitCodeTestPipelineStep>();
+
+        // Act
+        int exitCode = await pipeline.RunWithExitCodeAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        exitCode.ShouldBe(1234);
+    }
+
+    [Fact]
     public void UseStep_AddsStepToCollector()
     {
         // Arrange
@@ -66,6 +102,15 @@ class TestPipelineStep : IPipelineStep
     public Task Run(CancellationToken cancellationToken = default)
     {
         // Simulate some work
+        return Task.CompletedTask;
+    }
+}
+
+class SetExitCodeTestPipelineStep(IPipelineContext context) : IPipelineStep
+{
+    public Task Run(CancellationToken cancellationToken = default)
+    {
+        context.ExitCode = 1234;
         return Task.CompletedTask;
     }
 }
