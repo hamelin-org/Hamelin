@@ -9,22 +9,22 @@ namespace Hamelin;
 /// </summary>
 public static class ConsoleFormatterExtensions
 {
-    /// <summary>
-    /// Adds the pipeline friendly log formatter to the builder with the specified configuration.
-    /// </summary>
     /// <param name="builder"></param>
-    /// <param name="configure"></param>
-    public static ILoggingBuilder AddPipelineConsoleFormatter(
-        this ILoggingBuilder builder,
-        Action<PipelineConsoleFormatterOptions> configure) =>
-        builder.AddConsole(options => options.FormatterName = PipelineConsoleFormatter.FormatterName)
-            .AddConsoleFormatter<PipelineConsoleFormatter, PipelineConsoleFormatterOptions>(configure);
+    extension(ILoggingBuilder builder)
+    {
+        /// <summary>
+        /// Adds the pipeline friendly log formatter to the builder with the specified configuration.
+        /// </summary>
+        /// <param name="configure">A delegate to configure the formatter.</param>
+        public ILoggingBuilder AddPipelineConsoleFormatter(Action<PipelineConsoleFormatterOptions> configure) =>
+            builder.AddConsole(options => options.FormatterName = PipelineConsoleFormatter.FormatterName)
+                .AddConsoleFormatter<PipelineConsoleFormatter, PipelineConsoleFormatterOptions>(configure);
 
-    /// <summary>
-    /// Adds the pipeline friendly log formatter to the builder.
-    /// </summary>
-    /// <param name="builder"></param>
-    public static ILoggingBuilder AddPipelineConsoleFormatter(this ILoggingBuilder builder) =>
-        builder.AddConsole(options => options.FormatterName = PipelineConsoleFormatter.FormatterName)
-            .AddConsoleFormatter<PipelineConsoleFormatter, PipelineConsoleFormatterOptions>();
+        /// <summary>
+        /// Adds the pipeline friendly log formatter to the builder.
+        /// </summary>
+        public ILoggingBuilder AddPipelineConsoleFormatter() =>
+            builder.AddConsole(options => options.FormatterName = PipelineConsoleFormatter.FormatterName)
+                .AddConsoleFormatter<PipelineConsoleFormatter, PipelineConsoleFormatterOptions>();
+    }
 }

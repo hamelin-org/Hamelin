@@ -13,7 +13,7 @@ public class PipelineHostTests
     }
 
     [Fact]
-    public async Task StartAsync_WithSetEnvironmentExitCode_RunsPipelineAndSetsExitCode()
+    public async Task StartAndStopAsync_WithSetEnvironmentExitCode_RunsPipelineAndSetsExitCode()
     {
         // Arrange
         var context = Substitute.For<IPipelineContext>();
@@ -36,6 +36,7 @@ public class PipelineHostTests
 
         // Act
         await sut.StartAsync(CancellationToken.None);
+        await sut.ExecuteTask!.WaitAsync(CancellationToken.None);
 
         // Assert
         await runner.Received().RunPipeline(Arg.Any<CancellationToken>());
@@ -44,7 +45,7 @@ public class PipelineHostTests
     }
 
     [Fact]
-    public async Task StartAsync_WithoutSetEnvironmentExitCode_RunsPipelineAndDoesNotSetExitCode()
+    public async Task StartAndStopAsync_WithoutSetEnvironmentExitCode_RunsPipelineAndDoesNotSetExitCode()
     {
         // Arrange
         var context = Substitute.For<IPipelineContext>();
@@ -54,42 +55,45 @@ public class PipelineHostTests
 
         // Act
         await sut.StartAsync(CancellationToken.None);
+        await sut.ExecuteTask!.WaitAsync(CancellationToken.None);
 
         // Assert
         Environment.ExitCode.ShouldBe(0);
     }
 
     [Fact]
-    public async Task StartAsync_WithStopApplicationOnCompletion_StopsApplicationWhenFinished()
+    public async Task StartAndStopAsync_WithStopApplicationOnCompletion_StopsApplicationWhenFinished()
     {
         // Arrange
         var lifetime = Substitute.For<IHostApplicationLifetime>();
 
-        var host = PipelineHostHelpers.CreateHost(
+        var sut = PipelineHostHelpers.CreateHost(
             configure: options => options.StopApplicationOnCompletion = true,
             lifetime: lifetime
         );
 
         // Act
-        await host.StartAsync(CancellationToken.None);
+        await sut.StartAsync(CancellationToken.None);
+        await sut.ExecuteTask!.WaitAsync(CancellationToken.None);
 
         // Assert
         lifetime.Received().StopApplication();
     }
 
     [Fact]
-    public async Task StartAsync_WithoutStopApplicationOnCompletion_DoesNotStopApplicationWhenFinished()
+    public async Task StartAndStopAsync_WithoutStopApplicationOnCompletion_DoesNotStopApplicationWhenFinished()
     {
         // Arrange
         var lifetime = Substitute.For<IHostApplicationLifetime>();
 
-        var host = PipelineHostHelpers.CreateHost(
+        var sut = PipelineHostHelpers.CreateHost(
             configure: options => options.StopApplicationOnCompletion = false,
             lifetime: lifetime
         );
 
         // Act
-        await host.StartAsync(CancellationToken.None);
+        await sut.StartAsync(CancellationToken.None);
+        await sut.ExecuteTask!.WaitAsync(CancellationToken.None);
 
         // Assert
         lifetime.DidNotReceive().StopApplication();
