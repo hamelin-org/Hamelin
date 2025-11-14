@@ -10,6 +10,7 @@ namespace Hamelin;
 /// </summary>
 public class PipelineApplication : IHost
 {
+    private bool _hasRun = false;
     private readonly IHost _host;
 
     /// <summary>
@@ -25,7 +26,15 @@ public class PipelineApplication : IHost
     public IServiceProvider Services => _host.Services;
 
     /// <inheritdoc />
-    public Task StartAsync(CancellationToken cancellationToken) => _host.StartAsync(cancellationToken);
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        if (_hasRun)
+        {
+            throw new InvalidOperationException("The pipeline application can only be started once.");
+        }
+        _hasRun = true;
+        return _host.StartAsync(cancellationToken);
+    }
 
     /// <inheritdoc />
     public Task StopAsync(CancellationToken cancellationToken) => _host.StopAsync(cancellationToken);
@@ -84,9 +93,8 @@ public class PipelineApplication : IHost
             await this.WaitForShutdownAsync(cancellationToken).ConfigureAwait(false);
 
             // Retrieve the exit code from the pipeline execution summary.
-            var store = Services.GetRequiredService<IPipelineExecutionSummaryStore>();
-            var summary = store.GetAndClearSummary();
-            return summary?.ExitCode ?? PipelineExitCodes.MissingSummary;
+            var store = Services.GetRequiredService<PipelineExecutionSummaryStore>();
+            return store.Summary?.ExitCode ?? PipelineExitCodes.MissingSummary;
         }
         finally
         {

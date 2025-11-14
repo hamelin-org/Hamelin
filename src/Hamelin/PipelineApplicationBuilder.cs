@@ -98,7 +98,7 @@ public class PipelineApplicationBuilder : IHostApplicationBuilder
         services.TryAddSingleton<IPipelineStepRunner, DefaultPipelineStepRunner>();
         // Ideally this would be scoped, but it needs to be a singleton because
         // the scope ends with the pipeline run, so it can't be fetched after.
-        services.TryAddSingleton<IPipelineExecutionSummaryStore, DefaultPipelineExecutionSummaryStore>();
+        services.TryAddSingleton<PipelineExecutionSummaryStore>();
 
         services.TryAddScoped<IFileSystem>(_ => new PhysicalFileSystem(System.Environment.CurrentDirectory));
         services.TryAddScoped<IPipelineState, DefaultPipelineState>();
