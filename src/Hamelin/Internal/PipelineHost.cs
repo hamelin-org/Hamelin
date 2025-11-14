@@ -17,7 +17,7 @@ internal class PipelineHost(
     IOptions<PipelineExecutionOptions> options,
     IHostApplicationLifetime lifetime,
     IPipelineRunner runner,
-    IPipelineExecutionSummaryStore summaryStore
+    PipelineExecutionSummaryStore summaryStore
 ) : BackgroundService
 {
     /// <inheritdoc />
@@ -26,7 +26,7 @@ internal class PipelineHost(
         try
         {
             var summary = await runner.RunPipeline(cancellationToken);
-            summaryStore.SetSummary(summary);
+            summaryStore.Summary = summary;
             if (options.Value.SetEnvironmentExitCodeOnCompletion)
             {
                 Environment.ExitCode = summary.ExitCode;

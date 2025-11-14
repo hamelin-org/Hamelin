@@ -30,7 +30,7 @@ public class PipelineHostTests
             .RunPipeline(Arg.Any<CancellationToken>())
             .Returns(summary);
 
-        var summaryStore = Substitute.For<IPipelineExecutionSummaryStore>();
+        var summaryStore = new PipelineExecutionSummaryStore();
 
         var sut = PipelineHostHelpers.CreateHost(runner: runner, summaryStore: summaryStore);
 
@@ -40,7 +40,7 @@ public class PipelineHostTests
         // Assert
         await runner.Received().RunPipeline(Arg.Any<CancellationToken>());
         Environment.ExitCode.ShouldBe(1234);
-        summaryStore.Received().SetSummary(summary);
+        summaryStore.Summary.ShouldBe(summary);
     }
 
     [Fact]

@@ -12,12 +12,12 @@ internal static class PipelineHostHelpers
         Action<PipelineExecutionOptions>? configure = null,
         IHostApplicationLifetime? lifetime = null,
         ILogger<PipelineHost>? logger = null,
-        IPipelineExecutionSummaryStore? summaryStore = null
+        PipelineExecutionSummaryStore? summaryStore = null
     )
     {
         logger ??= Substitute.For<ILogger<PipelineHost>>();
         lifetime ??= Substitute.For<IHostApplicationLifetime>();
-        summaryStore ??= Substitute.For<IPipelineExecutionSummaryStore>();
+        summaryStore ??= new PipelineExecutionSummaryStore();
 
         PipelineExecutionOptions pipelineExecutionOptions = new();
         configure?.Invoke(pipelineExecutionOptions);

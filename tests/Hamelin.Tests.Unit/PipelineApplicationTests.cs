@@ -61,6 +61,23 @@ public class PipelineApplicationTests
     }
 
     [Fact]
+    public async Task StartAsync_MultipleTimes_ThrowsOnSecondCall()
+    {
+        // Arrange
+        var builder = PipelineApplication.CreateBuilder();
+        builder.Services.AddStep<TestPipelineStep>();
+
+        var pipeline = builder.Build();
+
+        // Act
+        await pipeline.StartAsync(TestContext.Current.CancellationToken);
+        var act = () => pipeline.StartAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        await act.ShouldThrowAsync<InvalidOperationException>();
+    }
+
+    [Fact]
     public void UseStep_AddsStepToCollector()
     {
         // Arrange
