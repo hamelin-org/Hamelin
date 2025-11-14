@@ -19,4 +19,9 @@ public class PipelineExecutionOptions
     /// If `true` then the pipeline will set the exit code automatically on failure.
     /// </summary>
     public bool EnableAutomaticExitCodes { get; set; } = true;
+
+    /// <summary>
+    /// Controls whether <see cref="Environment.ExitCode"/> is set after the pipeline has run.
+    /// </summary>
+    public bool SetEnvironmentExitCodeOnCompletion { get; set; } = true;
 }

@@ -13,14 +13,16 @@ public class PipelineHostTests
     }
 
     [Fact]
-    public async Task StartAsync_RunsPipelineAndSetsExitCode()
+    public async Task StartAsync_WithSetEnvironmentExitCode_RunsPipelineAndSetsExitCode()
     {
         // Arrange
         var context = Substitute.For<IPipelineContext>();
         context.ExitCode.Returns(1234);
 
-        PipelineExecutionOptions pipelineExecutionOptions = new();
-        var options = Options.Create(pipelineExecutionOptions);
+        var options = Options.Create(new PipelineExecutionOptions
+        {
+            SetEnvironmentExitCodeOnCompletion = true
+        });
         var summary = new PipelineExecutionSummary(options, context, [], CancellationToken.None);
 
         var runner = Substitute.For<IPipelineRunner>();
@@ -28,7 +30,9 @@ public class PipelineHostTests
             .RunPipeline(Arg.Any<CancellationToken>())
             .Returns(summary);
 
-        var sut = PipelineHostHelpers.CreateHost(runner);
+        var summaryStore = new PipelineExecutionSummaryStore();
+
+        var sut = PipelineHostHelpers.CreateHost(runner: runner, summaryStore: summaryStore);
 
         // Act
         await sut.StartAsync(CancellationToken.None);
@@ -36,6 +40,23 @@ public class PipelineHostTests
         // Assert
         await runner.Received().RunPipeline(Arg.Any<CancellationToken>());
         Environment.ExitCode.ShouldBe(1234);
+        summaryStore.Summary.ShouldBe(summary);
+    }
+
+    [Fact]
+    public async Task StartAsync_WithoutSetEnvironmentExitCode_RunsPipelineAndDoesNotSetExitCode()
+    {
+        // Arrange
+        var context = Substitute.For<IPipelineContext>();
+        context.ExitCode.Returns(1234);
+
+        var sut = PipelineHostHelpers.CreateHost(configure: options => options.SetEnvironmentExitCodeOnCompletion = false);
+
+        // Act
+        await sut.StartAsync(CancellationToken.None);
+
+        // Assert
+        Environment.ExitCode.ShouldBe(0);
     }
 
     [Fact]

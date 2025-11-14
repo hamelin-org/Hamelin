@@ -11,11 +11,13 @@ namespace Hamelin.Internal;
 /// <param name="options">Options to configure the pipeline execution</param>
 /// <param name="lifetime">The application lifetime.</param>
 /// <param name="runner">The service that will be used to run the pipeline.</param>
+/// <param name="summaryStore">The store for the pipeline execution summary.</param>
 internal class PipelineHost(
     ILogger<PipelineHost> logger,
     IOptions<PipelineExecutionOptions> options,
     IHostApplicationLifetime lifetime,
-    IPipelineRunner runner
+    IPipelineRunner runner,
+    PipelineExecutionSummaryStore summaryStore
 ) : BackgroundService
 {
     /// <inheritdoc />
@@ -24,7 +26,11 @@ internal class PipelineHost(
         try
         {
             var summary = await runner.RunPipeline(cancellationToken);
-            Environment.ExitCode = summary.ExitCode;
+            summaryStore.Summary = summary;
+            if (options.Value.SetEnvironmentExitCodeOnCompletion)
+            {
+                Environment.ExitCode = summary.ExitCode;
+            }
         }
         finally
         {

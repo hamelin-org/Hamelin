@@ -11,11 +11,13 @@ internal static class PipelineHostHelpers
         IPipelineRunner? runner = null,
         Action<PipelineExecutionOptions>? configure = null,
         IHostApplicationLifetime? lifetime = null,
-        ILogger<PipelineHost>? logger = null
+        ILogger<PipelineHost>? logger = null,
+        PipelineExecutionSummaryStore? summaryStore = null
     )
     {
         logger ??= Substitute.For<ILogger<PipelineHost>>();
         lifetime ??= Substitute.For<IHostApplicationLifetime>();
+        summaryStore ??= new PipelineExecutionSummaryStore();
 
         PipelineExecutionOptions pipelineExecutionOptions = new();
         configure?.Invoke(pipelineExecutionOptions);
@@ -36,6 +38,6 @@ internal static class PipelineHostHelpers
                 .Returns(summary);
         }
 
-        return new PipelineHost(logger, options, lifetime, runner);
+        return new PipelineHost(logger, options, lifetime, runner, summaryStore);
     }
 }

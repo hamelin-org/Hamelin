@@ -1,4 +1,5 @@
-﻿using Hamelin.Steps;
+﻿using Hamelin.Internal;
+using Hamelin.Steps;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -9,6 +10,7 @@ namespace Hamelin;
 /// </summary>
 public class PipelineApplication : IHost
 {
+    private bool _hasRun = false;
     private readonly IHost _host;
 
     /// <summary>
@@ -24,7 +26,15 @@ public class PipelineApplication : IHost
     public IServiceProvider Services => _host.Services;
 
     /// <inheritdoc />
-    public Task StartAsync(CancellationToken cancellationToken) => _host.StartAsync(cancellationToken);
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        if (_hasRun)
+        {
+            throw new InvalidOperationException("The pipeline application can only be started once.");
+        }
+        _hasRun = true;
+        return _host.StartAsync(cancellationToken);
+    }
 
     /// <inheritdoc />
     public Task StopAsync(CancellationToken cancellationToken) => _host.StopAsync(cancellationToken);
@@ -59,6 +69,37 @@ public class PipelineApplication : IHost
     {
         GC.SuppressFinalize(this);
         _host.Dispose();
+    }
+
+    /// <summary>
+    /// Runs the pipeline and returns the exit code from the execution.
+    /// </summary>
+    /// <returns>The exit code from the pipeline execution.</returns>
+    public int RunWithExitCode()
+    {
+        return RunWithExitCodeAsync().GetAwaiter().GetResult();
+    }
+
+    /// <summary>
+    /// Runs the pipeline and returns the exit code from the execution.
+    /// </summary>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>The exit code from the pipeline execution.</returns>
+    public async Task<int> RunWithExitCodeAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await StartAsync(cancellationToken).ConfigureAwait(false);
+            await this.WaitForShutdownAsync(cancellationToken).ConfigureAwait(false);
+
+            // Retrieve the exit code from the pipeline execution summary.
+            var store = Services.GetRequiredService<PipelineExecutionSummaryStore>();
+            return store.Summary?.ExitCode ?? PipelineExitCodes.MissingSummary;
+        }
+        finally
+        {
+            Dispose();
+        }
     }
 
     /// <summary>
